@@ -20,6 +20,8 @@
 #define PARQUET_STATICALLY_LOADED false
 #endif
 
+#include "quack_extension.hpp"
+
 #if defined(BUILD_TPCH_EXTENSION) && !defined(DISABLE_BUILTIN_EXTENSIONS)
 #define TPCH_STATICALLY_LOADED true
 #include "tpch-extension.hpp"
@@ -98,6 +100,7 @@ namespace duckdb {
 static DefaultExtension internal_extensions[] = {
     {"icu", "Adds support for time zones and collations using the ICU library", ICU_STATICALLY_LOADED},
     {"parquet", "Adds support for reading and writing parquet files", PARQUET_STATICALLY_LOADED},
+    {"quack", "Adds support for reading and writing quack files", true},
     {"tpch", "Adds TPC-H data generation and query support", TPCH_STATICALLY_LOADED},
     {"tpcds", "Adds TPC-DS data generation and query support", TPCDS_STATICALLY_LOADED},
     {"fts", "Adds support for Full-Text Search Indexes", FTS_STATICALLY_LOADED},
@@ -142,7 +145,7 @@ bool ExtensionHelper::AllowAutoInstall(const string &extension) {
 // Load Statically Compiled Extension
 //===--------------------------------------------------------------------===//
 void ExtensionHelper::LoadAllExtensions(DuckDB &db) {
-	unordered_set<string> extensions {"parquet", "icu",   "tpch",     "tpcds", "fts",      "httpfs",      "visualizer",
+	unordered_set<string> extensions {"parquet", "quack", "icu",   "tpch",     "tpcds", "fts",      "httpfs",      "visualizer",
 	                                  "json",    "excel", "sqlsmith", "inet",  "jemalloc", "autocomplete"};
 	for (auto &ext : extensions) {
 		LoadExtensionInternal(db, ext, true);
@@ -184,6 +187,8 @@ ExtensionLoadResult ExtensionHelper::LoadExtensionInternal(DuckDB &db, const std
 		// parquet extension required but not build: skip this test
 		return ExtensionLoadResult::NOT_LOADED;
 #endif
+	} else if (extension == "quack") {
+		db.LoadExtension<QuackExtension>();
 	} else if (extension == "icu") {
 #if ICU_STATICALLY_LOADED
 		db.LoadExtension<ICUExtension>();

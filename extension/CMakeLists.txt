@@ -45,6 +45,10 @@ if(${BUILD_JSON_EXTENSION})
   add_subdirectory(json)
 endif()
 
+if(${BUILD_QUACK_EXTENSION})
+  add_subdirectory(quack)
+endif()
+
 if(${BUILD_JEMALLOC_EXTENSION})
   add_subdirectory(jemalloc)
 endif()
