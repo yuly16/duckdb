@@ -20,16 +20,34 @@ inline void QuackScalarFun(DataChunk &args, ExpressionState &state, Vector &resu
         });
 }
 
+inline void QuackFuck(DataChunk &args, ExpressionState &state, Vector &result) {
+	auto &name_vector = args.data[0];
+	UnaryExecutor::Execute<string_t, string_t>(
+	    name_vector, result, args.size(),
+	    [&](string_t name) {
+		    return StringVector::AddString(result, "fuck you "+name.GetString()+" 🐥");;
+	    });
+}
+
 static void LoadInternal(DatabaseInstance &instance) {
 	Connection con(instance);
     con.BeginTransaction();
 
     auto &catalog = Catalog::GetSystemCatalog(*con.context);
 
-    CreateScalarFunctionInfo quack_fun_info(
-            ScalarFunction("quack", {LogicalType::VARCHAR}, LogicalType::VARCHAR, QuackScalarFun));
-    quack_fun_info.on_conflict = OnCreateConflict::ALTER_ON_CONFLICT;
-    catalog.CreateFunction(*con.context, &quack_fun_info);
+	{
+		CreateScalarFunctionInfo quack_fun_info(
+		    ScalarFunction("quack", {LogicalType::VARCHAR}, LogicalType::VARCHAR, QuackScalarFun));
+		quack_fun_info.on_conflict = OnCreateConflict::ALTER_ON_CONFLICT;
+		catalog.CreateFunction(*con.context, &quack_fun_info);
+	}
+	{
+		CreateScalarFunctionInfo quack_fun_info(
+		    ScalarFunction("fuck", {LogicalType::VARCHAR}, LogicalType::VARCHAR, QuackFuck));
+		quack_fun_info.on_conflict = OnCreateConflict::ALTER_ON_CONFLICT;
+		catalog.CreateFunction(*con.context, &quack_fun_info);
+	}
+
     con.Commit();
 }
 

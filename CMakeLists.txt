@@ -298,6 +298,7 @@ option(BUILD_VISUALIZER_EXTENSION "Build the profiler-output visualizer extensio
 option(BUILD_JSON_EXTENSION "Build the JSON extension." TRUE)
 option(BUILD_JEMALLOC_EXTENSION "Build the JEMalloc extension." ${JEMALLOC_DEFAULT_BUILD})
 option(BUILD_EXCEL_EXTENSION "Build the excel extension." TRUE)
+option(BUILD_PIXELS_EXTENSION "Build the pixels extension." TRUE)
 option(BUILD_QUACK_EXTENSION "Build the quack extension." TRUE)
 option(BUILD_INET_EXTENSION "Build the inet extension." FALSE)
 option(BUILD_BENCHMARKS "Enable building of the benchmark suite." FALSE)
@@ -610,6 +611,11 @@ function(add_extension_definitions)
     add_definitions(-DBUILD_EXCEL_EXTENSION=${BUILD_EXCEL_EXTENSION})
   endif()
 
+  if(${BUILD_PIXELS_EXTENSION})
+    include_directories(${PROJECT_SOURCE_DIR}/extension/pixels/include)
+    add_definitions(-DBUILD_PIXELS_EXTENSION=${BUILD_PIXELS_EXTENSION})
+  endif()
+
   if(${BUILD_QUACK_EXTENSION})
     include_directories(${PROJECT_SOURCE_DIR}/extension/quack/include)
     add_definitions(-DBUILD_QUACK_EXTENSION=${BUILD_QUACK_EXTENSION})
@@ -678,6 +684,10 @@ function(add_extension_dependencies LIBRARY)
     add_dependencies(${LIBRARY} excel_extension)
   endif()
 
+  if(${BUILD_PIXELS_EXTENSION})
+    add_dependencies(${LIBRARY} pixels_extension)
+  endif()
+
   if(${BUILD_QUACK_EXTENSION})
     add_dependencies(${LIBRARY} quack_extension)
   endif()
@@ -741,6 +751,10 @@ function(link_extension_libraries LIBRARY)
 
   if(${BUILD_EXCEL_EXTENSION})
     target_link_libraries(${LIBRARY} excel_extension)
+  endif()
+
+  if(${BUILD_PIXELS_EXTENSION})
+    target_link_libraries(${LIBRARY} pixels_extension)
   endif()
 
   if(${BUILD_QUACK_EXTENSION})
