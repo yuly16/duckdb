@@ -21,6 +21,10 @@ if(${BUILD_PARQUET_EXTENSION})
   add_subdirectory(parquet)
 endif()
 
+if(${BUILD_PIXELS_EXTENSION})
+  add_subdirectory(pixels)
+endif()
+
 if(${BUILD_TPCH_EXTENSION})
   add_subdirectory(tpch)
 endif()
