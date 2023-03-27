@@ -20,6 +20,24 @@
 #include "PixelsReadGlobalState.hpp"
 #include "PixelsReadLocalState.hpp"
 
+
+#include "physical/storage/LocalFS.h"
+#include "physical/natives/ByteBuffer.h"
+#include "physical/natives/DirectRandomAccessFile.h"
+#include "physical/io/PhysicalLocalReader.h"
+#include "physical/StorageFactory.h"
+#include "PixelsReaderImpl.h"
+#include "PixelsReaderBuilder.h"
+#include <iostream>
+#include <future>
+#include <thread>
+#include "physical/scheduler/NoopScheduler.h"
+#include "physical/SchedulerFactory.h"
+#include "PixelsVersion.h"
+#include "PixelsFooterCache.h"
+#include "exception/PixelsReaderException.h"
+#include "reader/PixelsReaderOption.h"
+
 #ifndef DUCKDB_AMALGAMATION
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/common/constants.hpp"
