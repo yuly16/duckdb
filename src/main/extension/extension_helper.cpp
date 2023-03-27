@@ -22,7 +22,7 @@
 
 #if defined(BUILD_PIXELS_EXTENSION) && !defined(DISABLE_BUILTIN_EXTENSIONS)
 #define PIXELS_STATICALLY_LOADED true
-#include "pixels_extension.hpp"
+#include "pixels-extension.hpp"
 #else
 #define PIXELS_STATICALLY_LOADED false
 #endif

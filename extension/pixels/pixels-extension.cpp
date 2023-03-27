@@ -3,14 +3,13 @@
 //
 #define DUCKDB_EXTENSION_MAIN
 
-#include "pixels_extension.hpp"
+#include "pixels-extension.hpp"
 #include "PixelsScanFunction.hpp"
 #include "duckdb.hpp"
 #include "duckdb/common/exception.hpp"
 #include "duckdb/common/string_util.hpp"
 #include "duckdb/function/scalar_function.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
-
 
 namespace duckdb {
 
