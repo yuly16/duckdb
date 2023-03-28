@@ -5,6 +5,7 @@
 
 #include "pixels-extension.hpp"
 #include "PixelsScanFunction.hpp"
+#include "PixelsReadBindData.hpp"
 #include "duckdb.hpp"
 #include "duckdb/common/exception.hpp"
 #include "duckdb/common/string_util.hpp"

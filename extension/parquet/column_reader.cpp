@@ -1308,7 +1308,7 @@ unique_ptr<ColumnReader> CreateDecimalReader(ParquetReader &reader, const Logica
 	}
 }
 
-unique_ptr<ColumnReader> ColumnReader::CreateReader(ParquetReader &reader, const LogicalType &type_p,
+unique_ptr<ColumnReader> ColumnReader::29501CreateReader(ParquetReader &reader, const LogicalType &type_p,
                                                     const SchemaElement &schema_p, idx_t file_idx_p, idx_t max_define,
                                                     idx_t max_repeat) {
 	switch (type_p.id()) {

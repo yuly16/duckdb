@@ -42,7 +42,7 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	option.setIncludeCols(includeCols);
 	option.setRGRange(0, 1);
 	option.setQueryId(1);
-	
+
 	PixelsFooterCache footerCache;
 	auto * builder = new PixelsReaderBuilder;
 	::Storage * storage = StorageFactory::getInstance()->getStorage(::Storage::file);
@@ -52,21 +52,11 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	                                 ->setPixelsFooterCache(footerCache)
 	                                 ->build();
 	PixelsRecordReader * pixelsRecordReader = pixelsReader->read(option);
-	std::shared_ptr<VectorizedRowBatch> v = pixelsRecordReader->readBatch(13, false);
 
-	for(const auto& col: v->cols) {
-		std::cout<<"------"<<std::endl;
-		col->print();
-	}
-	std::shared_ptr<VectorizedRowBatch> v1 = pixelsRecordReader->readBatch(12, false);
-	std::cout<<"------"<<std::endl;
-	std::cout<<"------"<<std::endl;
-	std::cout<<"------"<<std::endl;
-	std::cout<<"------"<<std::endl;
-	for(const auto& col: v1->cols) {
-		std::cout<<"------"<<std::endl;
-		col->print();
-	}
+	std::shared_ptr<TypeDescription> resultSchema = pixelsRecordReader->getResultSchema();
+
+	TransformDuckdbType(resultSchema, return_types);
+
 	return unique_ptr<FunctionData>();
 }
 
@@ -82,6 +72,47 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 	auto a = make_unique<PixelsReadLocalState>();
 	return a;
 }
-
+void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
+                                             vector<LogicalType> &return_types) {
+	auto columnSchemas = type->getChildren();
+	for(auto columnType: columnSchemas) {
+		switch (columnType->getCategory()) {
+			//        case TypeDescription::BOOLEAN:
+			//            break;
+			//        case TypeDescription::BYTE:
+			//            break;
+		case TypeDescription::SHORT:
+		case TypeDescription::INT:
+		case TypeDescription::LONG:
+			return_types.emplace_back(LogicalType::INTEGER);
+			//        case TypeDescription::FLOAT:
+			//            break;
+			//        case TypeDescription::DOUBLE:
+			//            break;
+			//        case TypeDescription::DECIMAL:
+			//            break;
+			//        case TypeDescription::STRING:
+			//            break;
+			//        case TypeDescription::DATE:
+			//            break;
+			//        case TypeDescription::TIME:
+			//            break;
+			//        case TypeDescription::TIMESTAMP:
+			//            break;
+			//        case TypeDescription::VARBINARY:
+			//            break;
+			//        case TypeDescription::BINARY:
+			//            break;
+		case TypeDescription::VARCHAR:
+			return_types.emplace_back(LogicalType::VARCHAR);
+		case TypeDescription::CHAR:
+			return_types.emplace_back(LogicalType::VARCHAR);
+			//        case TypeDescription::STRUCT:
+			//            break;
+		default:
+			throw InvalidArgumentException("bad column type " + std::to_string(type->getCategory()));
+		}
+	}
+}
 
 }
