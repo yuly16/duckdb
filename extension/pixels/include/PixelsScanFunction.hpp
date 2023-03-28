@@ -37,6 +37,7 @@
 #include "PixelsFooterCache.h"
 #include "exception/PixelsReaderException.h"
 #include "reader/PixelsReaderOption.h"
+#include "TypeDescription.h"
 
 #ifndef DUCKDB_AMALGAMATION
 #include "duckdb/catalog/catalog.hpp"
@@ -77,6 +78,9 @@ public:
 	static unique_ptr<LocalTableFunctionState>
 	PixelsScanInitLocal(ExecutionContext &context, TableFunctionInitInput &input, GlobalTableFunctionState *gstate_p);
 
+private:
+	static void TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
+	                         vector<LogicalType> &return_types);
 };
 
 } // namespace duckdb
