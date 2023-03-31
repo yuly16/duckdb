@@ -11,11 +11,13 @@
 #include "duckdb/common/string_util.hpp"
 #include "duckdb/function/scalar_function.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
+#include "reader/PixelsRecordReader.h"
 
 
 namespace duckdb {
 
-struct ParquetReadBindData : public TableFunctionData {
+struct PixelsReadBindData : public TableFunctionData {
+	shared_ptr<PixelsRecordReader> pixelsRecordReader;
 
 };
 

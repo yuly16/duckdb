@@ -19,7 +19,7 @@
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 #include "PixelsReadGlobalState.hpp"
 #include "PixelsReadLocalState.hpp"
-
+#include "PixelsReadBindData.hpp"
 
 #include "physical/storage/LocalFS.h"
 #include "physical/natives/ByteBuffer.h"

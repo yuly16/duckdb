@@ -43,19 +43,26 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	option.setRGRange(0, 1);
 	option.setQueryId(1);
 
+
 	PixelsFooterCache footerCache;
-	auto * builder = new PixelsReaderBuilder;
-	::Storage * storage = StorageFactory::getInstance()->getStorage(::Storage::file);
-	PixelsReader * pixelsReader = builder
-	                                 ->setPath(file_name)
-	                                 ->setStorage(storage)
-	                                 ->setPixelsFooterCache(footerCache)
-	                                 ->build();
-	PixelsRecordReader * pixelsRecordReader = pixelsReader->read(option);
+	auto  builder = std::make_shared<PixelsReaderBuilder>();
 
-	std::shared_ptr<TypeDescription> resultSchema = pixelsRecordReader->getResultSchema();
+	shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
+	auto a = builder->setPath(file_name);
+	auto b = a->setStorage(storage);
+	auto c = b->setPixelsFooterCache(footerCache);
+	auto pixelsReader = c->build();
+//	shared_ptr<PixelsReader> pixelsReader = builder
+//	                                 ->setPath(file_name)
+//	                                 ->setStorage(storage)
+//	                                 ->setPixelsFooterCache(footerCache)
+//	                                 ->build();
+	auto result = make_unique<PixelsReadBindData>();
+	auto d = pixelsReader->read(option);
 
-	TransformDuckdbType(resultSchema, return_types);
+//	std::shared_ptr<TypeDescription> resultSchema = result->pixelsRecordReader->getResultSchema();
+
+//	TransformDuckdbType(resultSchema, return_types);
 
 	return unique_ptr<FunctionData>();
 }
@@ -85,6 +92,7 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 		case TypeDescription::INT:
 		case TypeDescription::LONG:
 			return_types.emplace_back(LogicalType::INTEGER);
+			break;
 			//        case TypeDescription::FLOAT:
 			//            break;
 			//        case TypeDescription::DOUBLE:
@@ -105,8 +113,10 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 			//            break;
 		case TypeDescription::VARCHAR:
 			return_types.emplace_back(LogicalType::VARCHAR);
+			break;
 		case TypeDescription::CHAR:
 			return_types.emplace_back(LogicalType::VARCHAR);
+			break;
 			//        case TypeDescription::STRUCT:
 			//            break;
 		default:
