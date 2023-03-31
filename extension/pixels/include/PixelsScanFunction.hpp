@@ -38,7 +38,8 @@
 #include "exception/PixelsReaderException.h"
 #include "reader/PixelsReaderOption.h"
 #include "TypeDescription.h"
-
+#include "vector/ColumnVector.h"
+#include "vector/LongColumnVector.h"
 #ifndef DUCKDB_AMALGAMATION
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/common/constants.hpp"
@@ -81,6 +82,9 @@ public:
 private:
 	static void TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
 	                         vector<LogicalType> &return_types);
+	static void TransformDuckdbChunk(const std::shared_ptr<VectorizedRowBatch> &
+	    						vectorizedRowBatch, DataChunk &output,
+	                                 const std::shared_ptr<TypeDescription> & schema);
 };
 
 } // namespace duckdb
