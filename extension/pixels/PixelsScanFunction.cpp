@@ -10,6 +10,10 @@ TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 	TableFunctionSet set("pixels_scan");
 	TableFunction table_function({LogicalType::VARCHAR}, PixelsScanImplementation, PixelsScanBind,
 	                             PixelsScanInitGlobal, PixelsScanInitLocal);
+	table_function.projection_pushdown = true;
+	table_function.filter_pushdown = true;
+	table_function.filter_prune = true;
+	// TODO: maybe we need other code here. Refer parquet-extension.cpp
 	set.AddFunction(table_function);
 	return set;
 }
@@ -52,9 +56,9 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	// includeCols comes from the caller of PixelsPageSource
 	std::vector<std::string> includeCols;
 	includeCols.emplace_back("n_nationkey");
-	includeCols.emplace_back("n_name");
-	includeCols.emplace_back("n_regionkey");
-	includeCols.emplace_back("n_comment");
+//	includeCols.emplace_back("n_name");
+//	includeCols.emplace_back("n_regionkey");
+//	includeCols.emplace_back("n_comment");
 	option.setIncludeCols(includeCols);
 	option.setRGRange(0, 1);
 	option.setQueryId(1);
