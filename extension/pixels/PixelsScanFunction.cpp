@@ -29,9 +29,9 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	}
 	gstate.b = 1;
 	auto &bind_data = (PixelsReadBindData &)*data_p.bind_data;
-	output.SetCardinality(10);
+	output.SetCardinality(25);
 	std::shared_ptr<TypeDescription> resultSchema = bind_data.pixelsRecordReader->getResultSchema();
-	auto vectorizedRowBatch = bind_data.pixelsRecordReader->readBatch(10, false);
+	auto vectorizedRowBatch = bind_data.pixelsRecordReader->readBatch(25, false);
 	TransformDuckdbChunk(vectorizedRowBatch, output, resultSchema);
 	return;
 }
@@ -52,9 +52,9 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	// includeCols comes from the caller of PixelsPageSource
 	std::vector<std::string> includeCols;
 	includeCols.emplace_back("n_nationkey");
-//	includeCols.emplace_back("n_name");
+	includeCols.emplace_back("n_name");
 	includeCols.emplace_back("n_regionkey");
-//	includeCols.emplace_back("n_comment");
+	includeCols.emplace_back("n_comment");
 	option.setIncludeCols(includeCols);
 	option.setRGRange(0, 1);
 	option.setQueryId(1);
@@ -148,17 +148,18 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 		auto col = vectorizedRowBatch->cols.at(col_id);
 		auto colSchema = schema->getChildren().at(col_id);
 		switch (colSchema->getCategory()) {
-			//        case TypeDescription::BOOLEAN:
-			//            break;
-			//        case TypeDescription::BYTE:
-			//            break;
+				//        case TypeDescription::BOOLEAN:
+				//            break;
+				//        case TypeDescription::BYTE:
+				//            break;
 			case TypeDescription::SHORT:
 			case TypeDescription::INT:
-			case TypeDescription::LONG:
+			case TypeDescription::LONG: {
 				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
 				Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->vector);
 				output.data.at(col_id).Reference(vector);
 				break;
+			}
 			//        case TypeDescription::FLOAT:
 			//            break;
 			//        case TypeDescription::DOUBLE:
@@ -177,10 +178,18 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 			//            break;
 			//        case TypeDescription::BINARY:
 			//            break;
-			//		case TypeDescription::VARCHAR:
-			//			break;
-			//		case TypeDescription::CHAR:
-			//			break;
+			case TypeDescription::VARCHAR:
+			case TypeDescription::CHAR:
+		    {
+			    auto binaryCol = std::static_pointer_cast<BinaryColumnVector>(col);
+			    auto result_ptr = FlatVector::GetData<duckdb::string_t>(output.data.at(col_id));
+			    for(int row_id = 0; row_id < binaryCol->size; row_id++) {
+				    int length = binaryCol->lens[row_id];
+				    const char * data = (const char *)binaryCol->vector[row_id] + binaryCol->start[row_id];
+				    result_ptr[row_id] = duckdb::string_t(data, length);
+			    }
+			    break;
+		    }
 			//        case TypeDescription::STRUCT:
 			//            break;
 //			default:
