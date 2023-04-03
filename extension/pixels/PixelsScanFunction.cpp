@@ -24,18 +24,37 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	if (!data_p.local_state) {
 		return;
 	}
-	auto &data = (PixelsReadGlobalState &)*data_p.local_state;
+	auto &data = (PixelsReadLocalState &)*data_p.local_state;
 	auto &gstate = (PixelsReadGlobalState &)*data_p.global_state;
+	auto &bind_data = (PixelsReadBindData &)*data_p.bind_data;
 
-	// TODO: this termination code must be deleted later!
-	if(gstate.b > 0) {
+	if(data.pixelsRecordReader.get() == nullptr) {
+		PixelsReaderOption option;
+		option.setSkipCorruptRecords(true);
+		option.setTolerantSchemaEvolution(true);
+		option.setEnableEncodedColumnVector(true);
+
+		// includeCols comes from the caller of PixelsPageSource
+		std::vector<std::string> includeCols;
+		includeCols.emplace_back("n_nationkey");
+		includeCols.emplace_back("n_name");
+		includeCols.emplace_back("n_regionkey");
+		includeCols.emplace_back("n_comment");
+		option.setIncludeCols(includeCols);
+		option.setRGRange(0, 1);
+		option.setQueryId(1);
+		data.pixelsRecordReader = bind_data.pixelsReader->read(option);
+	}
+	auto pixelsRecordReader = data.pixelsRecordReader;
+
+	if(pixelsRecordReader->isEndOfFile()) {
+		data.pixelsRecordReader.reset();
 		return;
 	}
-	gstate.b = 1;
-	auto &bind_data = (PixelsReadBindData &)*data_p.bind_data;
-	output.SetCardinality(25);
-	std::shared_ptr<TypeDescription> resultSchema = bind_data.pixelsRecordReader->getResultSchema();
-	auto vectorizedRowBatch = bind_data.pixelsRecordReader->readBatch(25, false);
+	std::shared_ptr<TypeDescription> resultSchema = pixelsRecordReader->getResultSchema();
+	auto vectorizedRowBatch = pixelsRecordReader->readBatch(10000, false);
+	assert(vectorizedRowBatch->rowCount > 0);
+	output.SetCardinality(vectorizedRowBatch->rowCount);
 	TransformDuckdbChunk(vectorizedRowBatch, output, resultSchema);
 	return;
 }
@@ -48,22 +67,6 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	}
 	auto file_name = StringValue::Get(input.inputs[0]);
 
-	PixelsReaderOption option;
-	option.setSkipCorruptRecords(true);
-	option.setTolerantSchemaEvolution(true);
-	option.setEnableEncodedColumnVector(true);
-
-	// includeCols comes from the caller of PixelsPageSource
-	std::vector<std::string> includeCols;
-	includeCols.emplace_back("n_nationkey");
-//	includeCols.emplace_back("n_name");
-//	includeCols.emplace_back("n_regionkey");
-//	includeCols.emplace_back("n_comment");
-	option.setIncludeCols(includeCols);
-	option.setRGRange(0, 1);
-	option.setQueryId(1);
-
-
 	PixelsFooterCache footerCache;
 	auto  builder = std::make_shared<PixelsReaderBuilder>();
 
@@ -73,32 +76,24 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	                                 ->setStorage(storage)
 	                                 ->setPixelsFooterCache(footerCache)
 	                                 ->build();
+	std::shared_ptr<TypeDescription> fileSchema = pixelsReader->getFileSchema();
+	TransformDuckdbType(fileSchema, return_types);
+	names = fileSchema->getFieldNames();
+
 	auto result = make_unique<PixelsReadBindData>();
-
-	result->pixelsRecordReader = pixelsReader->read(option);
-	std::shared_ptr<TypeDescription> resultSchema = result->pixelsRecordReader->getResultSchema();
-
-	TransformDuckdbType(resultSchema, return_types);
-
-	for(auto name: includeCols) {
-		names.emplace_back(name);
-	}
-
+	result->pixelsReader = pixelsReader;
 	return result;
 }
 
 unique_ptr<GlobalTableFunctionState> PixelsScanFunction::PixelsScanInitGlobal(
     						ClientContext &context, TableFunctionInitInput &input) {
-	auto a = make_unique<PixelsReadGlobalState>();
-	a->b = 0;
-	return a;
+	return make_unique<PixelsReadGlobalState>();
 }
 
 unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
     						ExecutionContext &context, TableFunctionInitInput &input,
                             GlobalTableFunctionState *gstate_p) {
-	auto a = make_unique<PixelsReadLocalState>();
-	return a;
+	return make_unique<PixelsReadLocalState>();
 }
 void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
                                              vector<LogicalType> &return_types) {

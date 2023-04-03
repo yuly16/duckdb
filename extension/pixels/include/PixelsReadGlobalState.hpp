@@ -15,7 +15,7 @@
 namespace duckdb {
 
 struct PixelsReadGlobalState : public GlobalTableFunctionState {
-	int b;
+
 };
 
 }

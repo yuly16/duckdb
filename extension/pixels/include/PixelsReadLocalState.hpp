@@ -11,11 +11,12 @@
 #include "duckdb/function/scalar_function.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 
+#include "reader/PixelsRecordReader.h"
 
 namespace duckdb {
 
 struct PixelsReadLocalState : public LocalTableFunctionState {
-	int a;
+	std::shared_ptr<PixelsRecordReader> pixelsRecordReader;
 };
 
 }
