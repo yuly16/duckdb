@@ -18,7 +18,7 @@ namespace duckdb {
 
 struct PixelsReadBindData : public TableFunctionData {
 	shared_ptr<PixelsReader> pixelsReader;
-
+	shared_ptr<TypeDescription> fileSchema;
 };
 
 }

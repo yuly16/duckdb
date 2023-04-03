@@ -35,12 +35,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 		option.setEnableEncodedColumnVector(true);
 
 		// includeCols comes from the caller of PixelsPageSource
-		std::vector<std::string> includeCols;
-		includeCols.emplace_back("n_nationkey");
-		includeCols.emplace_back("n_name");
-		includeCols.emplace_back("n_regionkey");
-		includeCols.emplace_back("n_comment");
-		option.setIncludeCols(includeCols);
+		option.setIncludeCols(data.column_names);
 		option.setRGRange(0, 1);
 		option.setQueryId(1);
 		data.pixelsRecordReader = bind_data.pixelsReader->read(option);
@@ -67,7 +62,7 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	}
 	auto file_name = StringValue::Get(input.inputs[0]);
 
-	PixelsFooterCache footerCache;
+	auto footerCache = std::make_shared<PixelsFooterCache>();
 	auto  builder = std::make_shared<PixelsReaderBuilder>();
 
 	shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
@@ -82,6 +77,7 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 
 	auto result = make_unique<PixelsReadBindData>();
 	result->pixelsReader = pixelsReader;
+	result->fileSchema = fileSchema;
 	return result;
 }
 
@@ -93,8 +89,16 @@ unique_ptr<GlobalTableFunctionState> PixelsScanFunction::PixelsScanInitGlobal(
 unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
     						ExecutionContext &context, TableFunctionInitInput &input,
                             GlobalTableFunctionState *gstate_p) {
-	return make_unique<PixelsReadLocalState>();
+	auto &bind_data = (PixelsReadBindData &)*input.bind_data;
+	auto pixelsReadLocalState = make_unique<PixelsReadLocalState>();
+	pixelsReadLocalState->column_ids = input.column_ids;
+	auto fieldNames = bind_data.fileSchema->getFieldNames();
+	for(column_t column_id : input.column_ids) {
+		pixelsReadLocalState->column_names.emplace_back(fieldNames.at(column_id));
+	}
+	return pixelsReadLocalState;
 }
+
 void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
                                              vector<LogicalType> &return_types) {
 	auto columnSchemas = type->getChildren();

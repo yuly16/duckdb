@@ -17,6 +17,8 @@ namespace duckdb {
 
 struct PixelsReadLocalState : public LocalTableFunctionState {
 	std::shared_ptr<PixelsRecordReader> pixelsRecordReader;
+	vector<column_t> column_ids;
+	vector<string> column_names;
 };
 
 }
