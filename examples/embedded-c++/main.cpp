@@ -15,6 +15,6 @@ int main() {
 //	auto result = con.Query("select * from '/home/liyu/duckdb/data/json/timestamp_example.json'");
 //	auto result = con.Query("select * from read_json_objects('/home/liyu/duckdb/data/json/timestamp_example.json')");
 //	auto result = con.Query("select fuck('Jane') as result");
-	auto result = con.Query("select sum(n_nationkey) from '/home/liyu/pixels-reader-cxx/tests/data/20230316154717_0.pxl'");
+	auto result = con.Query("select * from '/home/liyu/pixels-reader-cxx/tests/data/20230316154717_0.pxl'");
 	result->Print();
 }
