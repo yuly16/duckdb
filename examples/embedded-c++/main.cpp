@@ -15,8 +15,8 @@ int main() {
 //	auto result = con.Query("select * from '/home/liyu/duckdb/data/json/timestamp_example.json'");
 //	auto result = con.Query("select * from read_json_objects('/home/liyu/duckdb/data/json/timestamp_example.json')");
 //	auto result = con.Query("select fuck('Jane') as result");
-	auto result = con.Query("select n_name from '/home/liyu/pixels-reader-cxx/tests/data/20230316154717_0.pxl'");
-	result->Print();
-//	auto result1 = con.Query("select * from '/home/liyu/pixels-reader-cxx/tests/data/20230316154717_0.pxl'");
-//	result1->Print();
+	auto result = con.Query("select n_name from '/scratch/liyu/opt/pixels-reader-cxx/tests/data/nation_0_01.pxl'");
+	result->Print()
+	auto result1 = con.Query("select * from '/scratch/liyu/opt/pixels-reader-cxx/tests/data/nation_0_01.pxl'");
+	result1->Print();
 }
