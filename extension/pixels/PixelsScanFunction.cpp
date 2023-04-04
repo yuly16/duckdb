@@ -186,7 +186,7 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 		    {
 			    auto binaryCol = std::static_pointer_cast<BinaryColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<duckdb::string_t>(output.data.at(col_id));
-			    for(int row_id = 0; row_id < binaryCol->size; row_id++) {
+			    for(int row_id = 0; row_id < vectorizedRowBatch->rowCount; row_id++) {
 				    int length = binaryCol->lens[row_id];
 				    const char * data = (const char *)binaryCol->vector[row_id] + binaryCol->start[row_id];
 				    result_ptr[row_id] = duckdb::string_t(data, length);
