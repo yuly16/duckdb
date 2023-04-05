@@ -43,6 +43,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	auto pixelsRecordReader = data.pixelsRecordReader;
 
 	if(pixelsRecordReader->isEndOfFile()) {
+		data.vectorizedRowBatchs.clear();
 		data.pixelsRecordReader.reset();
 		return;
 	}
@@ -50,6 +51,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	auto vectorizedRowBatch = pixelsRecordReader->readBatch(10000, false);
 	assert(vectorizedRowBatch->rowCount > 0);
 	output.SetCardinality(vectorizedRowBatch->rowCount);
+	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
 	TransformDuckdbChunk(vectorizedRowBatch, output, resultSchema);
 	return;
 }
