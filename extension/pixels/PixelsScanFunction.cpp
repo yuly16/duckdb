@@ -119,8 +119,9 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 			//            break;
 			//        case TypeDescription::DOUBLE:
 			//            break;
-			//        case TypeDescription::DECIMAL:
-			//            break;
+			case TypeDescription::DECIMAL:
+			    return_types.emplace_back(LogicalType::DECIMAL(columnType->getPrecision(), columnType->getScale()));
+			    break;
 			//        case TypeDescription::STRING:
 			//            break;
 			//        case TypeDescription::DATE:
@@ -142,7 +143,7 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 				//        case TypeDescription::STRUCT:
 				//            break;
 			default:
-				throw InvalidArgumentException("bad column type " + std::to_string(type->getCategory()));
+				throw InvalidArgumentException("bad column type in TransformDuckdbType: " + std::to_string(type->getCategory()));
 		}
 	}
 }
@@ -169,8 +170,14 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 			//            break;
 			//        case TypeDescription::DOUBLE:
 			//            break;
-			//        case TypeDescription::DECIMAL:
-			//            break;
+		    case TypeDescription::DECIMAL:{
+			    auto decimalCol = std::static_pointer_cast<DecimalColumnVector>(col);
+			    Vector vector(LogicalType::DECIMAL(colSchema->getPrecision(), colSchema->getScale()),
+			                  	(data_ptr_t)decimalCol->vector);
+			    output.data.at(col_id).Reference(vector);
+			    break;
+		    }
+
 			//        case TypeDescription::STRING:
 			//            break;
 			//        case TypeDescription::DATE:
