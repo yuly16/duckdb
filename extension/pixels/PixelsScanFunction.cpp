@@ -48,7 +48,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 		return;
 	}
 	std::shared_ptr<TypeDescription> resultSchema = pixelsRecordReader->getResultSchema();
-	auto vectorizedRowBatch = pixelsRecordReader->readBatch(10000, false);
+	auto vectorizedRowBatch = pixelsRecordReader->readBatch(STANDARD_VECTOR_SIZE, false);
 	assert(vectorizedRowBatch->rowCount > 0);
 	output.SetCardinality(vectorizedRowBatch->rowCount);
 	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
@@ -124,8 +124,9 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 			    break;
 			//        case TypeDescription::STRING:
 			//            break;
-			//        case TypeDescription::DATE:
-			//            break;
+			case TypeDescription::DATE:
+			    return_types.emplace_back(LogicalType::DATE);
+			    break;
 			//        case TypeDescription::TIME:
 			//            break;
 			//        case TypeDescription::TIMESTAMP:
@@ -180,8 +181,15 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 
 			//        case TypeDescription::STRING:
 			//            break;
-			//        case TypeDescription::DATE:
-			//            break;
+			case TypeDescription::DATE:{
+			    auto dateCol = std::static_pointer_cast<DateColumnVector>(col);
+			    assert(sizeof(*dateCol->dates) == sizeof(duckdb::date_t));
+			    Vector vector(LogicalType::DATE,
+			                  (data_ptr_t)dateCol->dates);
+			    output.data.at(col_id).Reference(vector);
+			    break;
+		    }
+
 			//        case TypeDescription::TIME:
 			//            break;
 			//        case TypeDescription::TIMESTAMP:
