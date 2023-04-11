@@ -10,7 +10,7 @@
 #include "duckdb/common/string_util.hpp"
 #include "duckdb/function/scalar_function.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
-
+#include "PixelsReader.h"
 #include "reader/PixelsRecordReader.h"
 
 namespace duckdb {
@@ -21,6 +21,9 @@ struct PixelsReadLocalState : public LocalTableFunctionState {
 	vector<shared_ptr<VectorizedRowBatch>> vectorizedRowBatchs;
 	vector<column_t> column_ids;
 	vector<string> column_names;
+	shared_ptr<PixelsReader> reader;
+	idx_t file_index;
+	idx_t batch_index;
 };
 
 }
