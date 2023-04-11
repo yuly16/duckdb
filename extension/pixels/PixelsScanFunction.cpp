@@ -6,6 +6,13 @@
 
 namespace duckdb {
 
+static idx_t PixelsScanGetBatchIndex(ClientContext &context, const FunctionData *bind_data_p,
+                                     LocalTableFunctionState *local_state,
+                                     GlobalTableFunctionState *global_state) {
+	auto &data = (PixelsReadLocalState &)*local_state;
+	return data.batch_index;
+}
+
 TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 	TableFunctionSet set("pixels_scan");
 	TableFunction table_function({LogicalType::VARCHAR}, PixelsScanImplementation, PixelsScanBind,
@@ -13,10 +20,13 @@ TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 	table_function.projection_pushdown = true;
 	table_function.filter_pushdown = true;
 	table_function.filter_prune = true;
+	table_function.get_batch_index = PixelsScanGetBatchIndex;
 	// TODO: maybe we need other code here. Refer parquet-extension.cpp
 	set.AddFunction(table_function);
 	return set;
 }
+
+
 
 void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
                                                    TableFunctionInput &data_p,
@@ -36,9 +46,9 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 
 		// includeCols comes from the caller of PixelsPageSource
 		option.setIncludeCols(data.column_names);
-		option.setRGRange(0, 1);
+		option.setRGRange(0, data.reader->getRowGroupNum());
 		option.setQueryId(1);
-		data.pixelsRecordReader = bind_data.pixelsReader->read(option);
+		data.pixelsRecordReader = data.reader->read(option);
 	}
 	auto pixelsRecordReader = data.pixelsRecordReader;
 
@@ -63,13 +73,15 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 		throw ParserException("Pixels reader cannot take NULL list as parameter");
 	}
 	auto file_name = StringValue::Get(input.inputs[0]);
-
+	FileSystem &fs = FileSystem::GetFileSystem(context);
+	auto files = fs.GlobFiles(file_name, context);
+	sort(files.begin(), files.end());
 	auto footerCache = std::make_shared<PixelsFooterCache>();
-	auto  builder = std::make_shared<PixelsReaderBuilder>();
+	auto builder = std::make_shared<PixelsReaderBuilder>();
 
 	shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
 	shared_ptr<PixelsReader> pixelsReader = builder
-	                                 ->setPath(file_name)
+	                                 ->setPath(files.at(0))
 	                                 ->setStorage(storage)
 	                                 ->setPixelsFooterCache(footerCache)
 	                                 ->build();
@@ -78,27 +90,78 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	names = fileSchema->getFieldNames();
 
 	auto result = make_unique<PixelsReadBindData>();
-	result->pixelsReader = pixelsReader;
+	result->initialPixelsReader = pixelsReader;
 	result->fileSchema = fileSchema;
+	result->files = files;
+
 	return result;
 }
 
 unique_ptr<GlobalTableFunctionState> PixelsScanFunction::PixelsScanInitGlobal(
     						ClientContext &context, TableFunctionInitInput &input) {
-	return make_unique<PixelsReadGlobalState>();
+
+	auto &bind_data = (PixelsReadBindData &)*input.bind_data;
+
+	auto result = make_unique<PixelsReadGlobalState>();
+
+	result->file_mutexes = std::unique_ptr<mutex[]>(new mutex[bind_data.files.size()]);
+
+	result->readers = std::vector<shared_ptr<PixelsReader>>(bind_data.files.size(), nullptr);
+
+	result->initialPixelsReader = bind_data.initialPixelsReader;
+	result->readers[0] = bind_data.initialPixelsReader;
+
+	result->file_index = 0;
+	result->max_threads = bind_data.files.size();
+
+	result->batch_index = 0;
+
+	return std::move(result);
 }
 
 unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
     						ExecutionContext &context, TableFunctionInitInput &input,
                             GlobalTableFunctionState *gstate_p) {
 	auto &bind_data = (PixelsReadBindData &)*input.bind_data;
-	auto pixelsReadLocalState = make_unique<PixelsReadLocalState>();
-	pixelsReadLocalState->column_ids = input.column_ids;
+
+	auto &gstate = (PixelsReadGlobalState &)*gstate_p;
+
+	auto result = make_unique<PixelsReadLocalState>();
+
+	result->column_ids = input.column_ids;
+
+
 	auto fieldNames = bind_data.fileSchema->getFieldNames();
 	for(column_t column_id : input.column_ids) {
-		pixelsReadLocalState->column_names.emplace_back(fieldNames.at(column_id));
+		result->column_names.emplace_back(fieldNames.at(column_id));
 	}
-	return pixelsReadLocalState;
+
+	unique_lock<mutex> parallel_lock(gstate.lock);
+
+
+	if (gstate.error_opening_file) {
+		throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
+	}
+	if (gstate.file_index >= gstate.readers.size()) {
+		throw InvalidArgumentException("PixelsScanInitLocal: file index should not be larger than the size of reader.");
+	}
+	if (gstate.readers[gstate.file_index]) {
+		result->reader = gstate.readers[gstate.file_index];
+		result->file_index = gstate.file_index;
+	} else {
+		auto footerCache = std::make_shared<PixelsFooterCache>();
+		auto builder = std::make_shared<PixelsReaderBuilder>();
+		shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
+		result->reader = builder->setPath(bind_data.files.at(gstate.file_index))
+							->setStorage(storage)
+							->setPixelsFooterCache(footerCache)
+							->build();
+		gstate.readers[gstate.file_index] = result->reader;
+
+	}
+	result->batch_index = gstate.file_index;
+	gstate.file_index++;
+	return std::move(result);
 }
 
 void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
