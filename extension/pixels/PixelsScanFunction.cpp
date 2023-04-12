@@ -62,7 +62,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	assert(vectorizedRowBatch->rowCount > 0);
 	output.SetCardinality(vectorizedRowBatch->rowCount);
 	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
-	TransformDuckdbChunk(vectorizedRowBatch, output, resultSchema);
+	TransformDuckdbChunk(data.column_ids, vectorizedRowBatch, output, resultSchema);
 	return;
 }
 
@@ -132,8 +132,12 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 
 
 	auto fieldNames = bind_data.fileSchema->getFieldNames();
+
+
 	for(column_t column_id : input.column_ids) {
-		result->column_names.emplace_back(fieldNames.at(column_id));
+		if (!IsRowIdColumnId(column_id)) {
+			result->column_names.emplace_back(fieldNames.at(column_id));
+		}
 	}
 
 	unique_lock<mutex> parallel_lock(gstate.lock);
@@ -211,12 +215,19 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 		}
 	}
 }
-void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatch> &vectorizedRowBatch,
-                                              DataChunk &output,
+void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_ids,
+                                              const shared_ptr<VectorizedRowBatch> & vectorizedRowBatch,
+                                              DataChunk & output,
                                               const std::shared_ptr<TypeDescription> & schema) {
-	for(int col_id = 0; col_id < vectorizedRowBatch->numCols; col_id++) {
-		auto col = vectorizedRowBatch->cols.at(col_id);
-		auto colSchema = schema->getChildren().at(col_id);
+	int row_batch_id = 0;
+	for(int col_id = 0; col_id < column_ids.size(); col_id++) {
+		if (IsRowIdColumnId(column_ids.at(col_id))) {
+			    Value constant_42 = Value::BIGINT(42);
+			    output.data[col_id].Reference(constant_42);
+			    continue;
+		}
+		auto col = vectorizedRowBatch->cols.at(row_batch_id);
+		auto colSchema = schema->getChildren().at(row_batch_id);
 		switch (colSchema->getCategory()) {
 				//        case TypeDescription::BOOLEAN:
 				//            break;
@@ -278,6 +289,7 @@ void PixelsScanFunction::TransformDuckdbChunk(const shared_ptr<VectorizedRowBatc
 //			default:
 //				throw InvalidArgumentException("bad column type " + std::to_string(colSchema->getCategory()));
 		}
+		row_batch_id++;
 	}
 }
 

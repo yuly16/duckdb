@@ -13,7 +13,7 @@ int main() {
 
 	// multiple table parquet example
 //	{
-//		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/glob/*.parquet'");
+//		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/glob/t1.parquet'");
 //		result->Print();
 //	}
 
