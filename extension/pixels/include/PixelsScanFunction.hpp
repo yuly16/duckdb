@@ -82,9 +82,10 @@ public:
 private:
 	static void TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
 	                         vector<LogicalType> &return_types);
-	static void TransformDuckdbChunk(const std::shared_ptr<VectorizedRowBatch> &
-	    						vectorizedRowBatch, DataChunk &output,
-	                                 const std::shared_ptr<TypeDescription> & schema);
+	static void TransformDuckdbChunk(const vector<column_t> & column_ids,
+	    						const std::shared_ptr<VectorizedRowBatch> & vectorizedRowBatch,
+	                            DataChunk &output,
+	                            const std::shared_ptr<TypeDescription> & schema);
 };
 
 } // namespace duckdb
