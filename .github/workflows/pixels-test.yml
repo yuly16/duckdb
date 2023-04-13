@@ -31,6 +31,11 @@ jobs:
         mysql password: 12345678 # Required if "mysql user" exists. The password for the "mysql user"
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'zulu'
     - name: pixels-install
       run: |
         cd extension/pixels/pixels
