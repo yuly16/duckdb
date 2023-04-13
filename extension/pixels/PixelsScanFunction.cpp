@@ -19,7 +19,7 @@ TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 	                             PixelsScanInitGlobal, PixelsScanInitLocal);
 	table_function.projection_pushdown = true;
 	table_function.filter_pushdown = true;
-	table_function.filter_prune = true;
+//	table_function.filter_prune = true;
 	table_function.get_batch_index = PixelsScanGetBatchIndex;
 	// TODO: maybe we need other code here. Refer parquet-extension.cpp
 	set.AddFunction(table_function);
