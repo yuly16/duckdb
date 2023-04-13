@@ -41,7 +41,7 @@ jobs:
         cd extension/pixels/pixels-sink
         pwd
         ls -a
-        which mvn
+        mvn -v
         mvn install
 
         
