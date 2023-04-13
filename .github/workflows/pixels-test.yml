@@ -45,18 +45,18 @@ jobs:
         java-version: '17'
         distribution: 'zulu'
         
-    - name: Pixels Installation
+    - name: Install pixels
       run: |
         cd extension/pixels/pixels
         mvn package install
-        cd ../pixels-sink
+        
+    - name: Install pixels-sink
+      run: |
+        cd extension/pixels/pixels-sink
         mvn install
         
     - name: Duckdb Installation
       run: |
-        cd ../../../
-        pwd
-        ls
         BUILD_BENCHMARK=1 BUILD_TPCH=1 make -j
       
 
