@@ -1,0 +1,31 @@
+name: pixels-test
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+  # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "mysql-start"
+  mysql-start:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mirromutth/mysql-action@v1.1
+    with:
+      host port: 3800 # Optional, default value is 3306. The port of host
+      container port: 3307 # Optional, default value is 3306. The port of container
+      character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+      collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+      mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
+      mysql database: 'pixels-metadata' # Optional, default value is "test". The specified database which will be create
+      mysql root password: 12345678 # Required if "mysql user" is empty, default is empty. The root superuser password
+      mysql user: 'liyu' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+      mysql password: 12345678 # Required if "mysql user" exists. The password for the "mysql user"
