@@ -11,7 +11,7 @@ on:
   
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "mysql-start"
+  # This workflow contains a single job called "test"
   test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -28,19 +28,34 @@ jobs:
         mysql user: 'liyu' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
         mysql password: 12345678 # Required if "mysql user" exists. The password for the "mysql user"
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    
+    - name: protobuf Installation
+      run: sudo apt-get install protobuf-compiler
+      
+    - name: tbb Installation
+      run: sudo apt-get install libtbb-dev
+      
     - uses: actions/checkout@v2
       with:
         submodules: 'true'
+        
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'zulu'
-    - name: pixels-install
+        
+    - name: Pixels Installation
       run: |
         cd extension/pixels/pixels
         mvn package install
         cd ../pixels-sink
         mvn install
+        
+    - name: Duckdb Installation
+      run: |
+        cd ../../../
+        BUILD_BENCHMARK=1 BUILD_TPCH=1 make -j
+      
 
         
