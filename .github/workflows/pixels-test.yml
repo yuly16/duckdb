@@ -39,6 +39,9 @@ jobs:
     - name: pixels-install
       run: |
         cd extension/pixels/pixels
+        pwd
+        ls -a
+        which mvn
         mvn package
         cd ../pixels-sink
         mvn package
