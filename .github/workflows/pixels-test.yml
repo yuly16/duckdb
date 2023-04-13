@@ -38,10 +38,9 @@ jobs:
         distribution: 'zulu'
     - name: pixels-install
       run: |
-        cd extension/pixels/pixels-sink
-        pwd
-        ls -a
-        mvn -v
+        cd extension/pixels/pixels
+        mvn package install
+        cd ../pixels-sink
         mvn install
 
         
