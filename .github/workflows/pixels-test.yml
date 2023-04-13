@@ -55,6 +55,8 @@ jobs:
     - name: Duckdb Installation
       run: |
         cd ../../../
+        pwd
+        ls
         BUILD_BENCHMARK=1 BUILD_TPCH=1 make -j
       
 
