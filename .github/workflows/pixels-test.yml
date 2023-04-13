@@ -45,14 +45,18 @@ jobs:
         java-version: '17'
         distribution: 'zulu'
         
-    - name: Install pixels
+    - name: Download and install pixels
       run: |
-        cd extension/pixels/pixels
+        cd extension/pixels
+        git clone https://github.com/pixelsdb/pixels.git
+        cd pixels
         mvn package install
         
-    - name: Install pixels-sink
+    - name: Download and install pixels-sink
       run: |
-        cd extension/pixels/pixels-sink
+        cd extension/pixels
+        git clone https://github.com/pixelsdb/pixels-sink.git
+        cd pixels-sink
         mvn install
         
     - name: Duckdb Installation
