@@ -31,9 +31,21 @@ int main() {
 //	auto result1 = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/supplier_0_1.pxl'");
 //	result1->Print();
 
+
 	// pixels
 	{
-		auto result = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_multiple/v-0-order/*.pxl'");
+		auto result = con.Query("SELECT\n"
+		                        "    count(*) AS count_order\n"
+		                        "FROM\n"
+		                        "    '/home/yuly/project/data/lineitem/*.pxl'\n"
+		                        "WHERE\n"
+		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+		                        "GROUP BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus\n"
+		                        "ORDER BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus;");
 		result->Print();
 	}
 
