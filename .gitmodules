@@ -1,0 +1,9 @@
+[submodule "extension/pixels/pixels-reader-cxx"]
+	path = extension/pixels/pixels-reader-cxx
+	url = https://github.com/yuly16/pixels-reader-cxx.git
+[submodule "extension/pixels/pixels-sink"]
+	path = extension/pixels/pixels-sink
+	url = https://github.com/pixelsdb/pixels-sink
+[submodule "extension/pixels/pixels"]
+	path = extension/pixels/pixels
+	url = https://github.com/pixelsdb/pixels.git
