@@ -29,6 +29,8 @@ jobs:
         mysql root password: 12345678 # Required if "mysql user" is empty, default is empty. The root superuser password
         mysql user: 'liyu' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
         mysql password: 12345678 # Required if "mysql user" exists. The password for the "mysql user"
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
     - name: pixels-install
       run: |
         cd extension/pixels/pixels
