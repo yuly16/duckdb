@@ -59,10 +59,33 @@ jobs:
         cd pixels-sink
         mvn install
         
-    - name: Duckdb Installation
+    - name: Generate TPCH
+      run: |
+        git clone https://github.com/electrum/tpch-dbgen.git
+        cd tpch-dbgen
+        make
+        dbgen -vf -s 1
+        mkdir -p tpch_data/tpch_1/customer
+        mv customer.tbl tpch_data/tpch_1/customer/
+        mkdir -p tpch_data/tpch_1/lineitem   
+        mv lineitem.tbl tpch_data/tpch_1/lineitem/
+        mkdir -p tpch_data/tpch_1/nation
+        mv nation.tbl tpch_data/tpch_1/nation/
+        mkdir -p tpch_data/tpch_1/orders
+        mv orders.tbl tpch_data/tpch_1/orders/
+        mkdir -p tpch_data/tpch_1/partsupp
+        mv partsupp.tbl tpch_data/tpch_1/partsupp/
+        mkdir -p tpch_data/tpch_1/part
+        mv part.tbl tpch_data/tpch_1/part/
+        mkdir -p tpch_data/tpch_1/region
+        mv region.tbl tpch_data/tpch_1/region/
+        mkdir -p tpch_data/tpch_1/supplier
+        mv supplier.tbl tpch_data/tpch_1/supplier/
+        
+    - name: Install Duckdb
       run: |
         cat /proc/cpuinfo
-        BUILD_BENCHMARK=1 BUILD_TPCH=1 make
+        BUILD_BENCHMARK=1 BUILD_TPCH=1 make -j 2
       
 
         
