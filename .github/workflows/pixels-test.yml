@@ -64,7 +64,8 @@ jobs:
         git clone https://github.com/electrum/tpch-dbgen.git
         cd tpch-dbgen
         make
-        dbgen -vf -s 1
+        ls
+        ./dbgen -vf -s 1
         mkdir -p tpch_data/tpch_1/customer
         mv customer.tbl tpch_data/tpch_1/customer/
         mkdir -p tpch_data/tpch_1/lineitem   
