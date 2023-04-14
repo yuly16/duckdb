@@ -61,7 +61,8 @@ jobs:
         
     - name: Duckdb Installation
       run: |
-        BUILD_BENCHMARK=1 BUILD_TPCH=1 make -j
+        cat /proc/cpuinfo
+        BUILD_BENCHMARK=1 BUILD_TPCH=1 make
       
 
         
