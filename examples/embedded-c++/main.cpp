@@ -23,6 +23,11 @@ int main() {
 //		result->Print();
 //	}
 
+//	{
+//		auto result = con.Query("select count(*) from '/scratch/liyu/opt/duckdb/duckdb_benchmark_data/lineitem_10.parquet'");
+//		result->Print();
+//	}
+
 	//	auto result = con.Query("select * from '/home/liyu/duckdb/data/json/timestamp_example.json'");
 //	auto result = con.Query("select * from read_json_objects('/home/liyu/duckdb/data/json/timestamp_example.json')");
 //	auto result = con.Query("select fuck('Jane') as result");
@@ -33,21 +38,30 @@ int main() {
 
 
 	// pixels
-//	{
-//		auto result = con.Query("SELECT\n"
-//		                        "    count(*) AS count_order\n"
-//		                        "FROM\n"
-//		                        "    '/home/yuly/project/data/lineitem/*.pxl'\n"
-//		                        "WHERE\n"
-//		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
-//		                        "GROUP BY\n"
-//		                        "    l_returnflag,\n"
-//		                        "    l_linestatus\n"
-//		                        "ORDER BY\n"
-//		                        "    l_returnflag,\n"
-//		                        "    l_linestatus;");
-//		result->Print();
-//	}
+	{
+		auto result = con.Query("SELECT\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus,\n"
+		                        "    sum(l_quantity) AS sum_qty,\n"
+		                        "    sum(l_extendedprice) AS sum_base_price,\n"
+		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
+		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
+		                        "    avg(l_quantity) AS avg_qty,\n"
+		                        "    avg(l_extendedprice) AS avg_price,\n"
+		                        "    avg(l_discount) AS avg_disc,\n"
+		                        "    count(*) AS count_order\n"
+		                        "FROM\n"
+		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl'\n"
+		                        "WHERE\n"
+		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+		                        "GROUP BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus\n"
+		                        "ORDER BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus;");
+		result->Print();
+	}
     {
         auto result = con.Query("SELECT count(*) from '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl';");
         result->Print();

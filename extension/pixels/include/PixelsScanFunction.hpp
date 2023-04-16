@@ -78,7 +78,8 @@ public:
 	                                                                  TableFunctionInitInput &input);
 	static unique_ptr<LocalTableFunctionState>
 	PixelsScanInitLocal(ExecutionContext &context, TableFunctionInitInput &input, GlobalTableFunctionState *gstate_p);
-
+	static bool PixelsParallelStateNext(ClientContext &context, const PixelsReadBindData &bind_data,
+	                                     PixelsReadLocalState &scan_data, PixelsReadGlobalState &parallel_state);
 private:
 	static void TransformDuckdbType(const std::shared_ptr<TypeDescription>& type,
 	                         vector<LogicalType> &return_types);
