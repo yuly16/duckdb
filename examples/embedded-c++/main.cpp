@@ -33,20 +33,23 @@ int main() {
 
 
 	// pixels
-	{
-		auto result = con.Query("SELECT\n"
-		                        "    count(*) AS count_order\n"
-		                        "FROM\n"
-		                        "    '/home/yuly/project/data/lineitem/*.pxl'\n"
-		                        "WHERE\n"
-		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
-		                        "GROUP BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus\n"
-		                        "ORDER BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus;");
-		result->Print();
-	}
-
+//	{
+//		auto result = con.Query("SELECT\n"
+//		                        "    count(*) AS count_order\n"
+//		                        "FROM\n"
+//		                        "    '/home/yuly/project/data/lineitem/*.pxl'\n"
+//		                        "WHERE\n"
+//		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+//		                        "GROUP BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus\n"
+//		                        "ORDER BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus;");
+//		result->Print();
+//	}
+    {
+        auto result = con.Query("SELECT count(*) from '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl';");
+        result->Print();
+    }
 }
