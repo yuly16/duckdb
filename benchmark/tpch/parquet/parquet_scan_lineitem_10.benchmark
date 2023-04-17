@@ -9,9 +9,9 @@ subgroup tpch
 require parquet
 require tpch
 
-#load
-#CALL dbgen(sf=10, suffix='_normal');
-#COPY lineitem_normal TO '${BENCHMARK_DIR}/lineitem_10.parquet' (FORMAT PARQUET);
+load
+CALL dbgen(sf=10, suffix='_normal');
+COPY lineitem_normal TO '${BENCHMARK_DIR}/lineitem_10.parquet' (FORMAT PARQUET);
 
 run
 select * from read_parquet('${BENCHMARK_DIR}/lineitem_10.parquet');

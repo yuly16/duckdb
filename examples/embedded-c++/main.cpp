@@ -2,6 +2,59 @@
 #include <iostream>
 using namespace duckdb;
 
+string lineitem_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl')");
+string supplier_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/supplier/v-0-order/*.pxl')");
+string nation_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/nation/v-0-order/*.pxl')");
+string region_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/region/v-0-order/*.pxl')");
+string partsupp_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl')");
+
+
+void tpch_q02(Connection & con) {
+	auto result = con.Query("SELECT\n"
+	                        "    s_acctbal,\n"
+	                        "    s_name,\n"
+	                        "    n_name,\n"
+	                        "    p_partkey,\n"
+	                        "    p_mfgr,\n"
+	                        "    s_address,\n"
+	                        "    s_phone,\n"
+	                        "    s_comment\n"
+	                        "FROM\n"
+	                        "    " + partsupp_path + ",\n"
+							"    " + supplier_path + ",\n"
+							"    " + nation_path + ",\n"
+							"    " + region_path + "\n"
+	                        "WHERE\n"
+	                        "    p_partkey = ps_partkey\n"
+	                        "    AND s_suppkey = ps_suppkey\n"
+	                        "    AND p_size = 15\n"
+	                        "    AND p_type LIKE '%BRASS'\n"
+	                        "    AND s_nationkey = n_nationkey\n"
+	                        "    AND n_regionkey = r_regionkey\n"
+	                        "    AND r_name = 'EUROPE'\n"
+	                        "    AND ps_supplycost = (\n"
+	                        "        SELECT\n"
+	                        "            min(ps_supplycost)\n"
+	                        "        FROM\n"
+	                                      "    " + partsupp_path + ",\n"
+	                                      "    " + supplier_path + ",\n"
+											"    " + nation_path + ",\n"
+	                                      "    " + region_path + "\n"
+	                        "        WHERE\n"
+	                        "            p_partkey = ps_partkey\n"
+	                        "            AND s_suppkey = ps_suppkey\n"
+	                        "            AND s_nationkey = n_nationkey\n"
+	                        "            AND n_regionkey = r_regionkey\n"
+	                        "            AND r_name = 'EUROPE')\n"
+	                        "ORDER BY\n"
+	                        "    s_acctbal DESC,\n"
+	                        "    n_name,\n"
+	                        "    s_name,\n"
+	                        "    p_partkey\n"
+	                        "LIMIT 100;");
+	result->Print();
+}
+
 int main() {
 	DuckDB db(nullptr);
 	Connection con(db);
@@ -37,33 +90,40 @@ int main() {
 //	result1->Print();
 
 
-	// pixels
-	{
-		auto result = con.Query("SELECT\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus,\n"
-		                        "    sum(l_quantity) AS sum_qty,\n"
-		                        "    sum(l_extendedprice) AS sum_base_price,\n"
-		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
-		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
-		                        "    avg(l_quantity) AS avg_qty,\n"
-		                        "    avg(l_extendedprice) AS avg_price,\n"
-		                        "    avg(l_discount) AS avg_disc,\n"
-		                        "    count(*) AS count_order\n"
-		                        "FROM\n"
-		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl'\n"
-		                        "WHERE\n"
-		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
-		                        "GROUP BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus\n"
-		                        "ORDER BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus;");
-		result->Print();
-	}
-    {
-        auto result = con.Query("SELECT count(*) from '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl';");
-        result->Print();
-    }
+	// pixels tpch q1
+//	{
+//		auto result = con.Query("SELECT\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus,\n"
+//		                        "    sum(l_quantity) AS sum_qty,\n"
+//		                        "    sum(l_extendedprice) AS sum_base_price,\n"
+//		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
+//		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
+//		                        "    avg(l_quantity) AS avg_qty,\n"
+//		                        "    avg(l_extendedprice) AS avg_price,\n"
+//		                        "    avg(l_discount) AS avg_disc,\n"
+//		                        "    count(*) AS count_order\n"
+//		                        "FROM\n"
+//		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-10/lineitem/v-0-order/*.pxl'\n"
+//		                        "WHERE\n"
+//		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+//		                        "GROUP BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus\n"
+//		                        "ORDER BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus;");
+//		result->Print();
+//	}
+
+//    {
+//        auto result = con.Query("SELECT * from '/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl';");
+//        result->Print();
+//    }
+	tpch_q02(con);
+
+//	{
+//		auto result = con.Query("SELECT * from '/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl';");
+//		result->Print();
+//	}
 }
