@@ -2,12 +2,12 @@
 #include <iostream>
 using namespace duckdb;
 
-string lineitem_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl')");
-string supplier_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/supplier/v-0-order/*.pxl')");
-string nation_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/nation/v-0-order/*.pxl')");
-string region_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/region/v-0-order/*.pxl')");
-string partsupp_path("pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl')");
-
+string lineitem_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl'");
+string supplier_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/supplier/v-0-order/*.pxl'");
+string nation_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/nation/v-0-order/*.pxl'");
+string region_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/region/v-0-order/*.pxl'");
+string partsupp_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl'");
+string part_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/part/v-0-order/*.pxl'");
 
 void tpch_q02(Connection & con) {
 	auto result = con.Query("SELECT\n"
@@ -20,6 +20,7 @@ void tpch_q02(Connection & con) {
 	                        "    s_phone,\n"
 	                        "    s_comment\n"
 	                        "FROM\n"
+	                        "    " + part_path + ",\n"
 	                        "    " + partsupp_path + ",\n"
 							"    " + supplier_path + ",\n"
 							"    " + nation_path + ",\n"

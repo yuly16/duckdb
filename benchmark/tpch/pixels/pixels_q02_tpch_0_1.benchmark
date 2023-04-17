@@ -1,0 +1,8 @@
+# name: benchmark/tpch/parquet/parquet_q1.benchmark
+# description: Execute Q1 over lineitem stored in a parquet file
+# group: [parquet]
+
+template benchmark/tpch/pixels/pixels_tpch_template.benchmark.in
+SF_NUMBER=0.1
+SF_NUMBER_UNDERSCORE=0_1
+QUERY_NUMBER_PADDED=02

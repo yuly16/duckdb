@@ -1,0 +1,23 @@
+# name: benchmark/tpch/parquet/parquet_q1.benchmark
+# description: Execute Q1 over lineitem stored in a parquet file
+# group: [parquet]
+
+name Q1 (Parquet)
+group parquet
+subgroup tpch
+
+require parquet
+require tpch
+
+load
+CALL dbgen(sf=1, suffix='_normal');
+
+run
+COPY lineitem_normal TO 'lineitem.tbl' ( DELIMITER '|' );
+COPY supplier_normal TO 'supplier.tbl' ( DELIMITER '|' );
+COPY part_normal TO 'part.tbl' ( DELIMITER '|' );
+COPY partsupp_normal TO 'partsupp.tbl' ( DELIMITER '|' );
+COPY customer_normal TO 'customer.tbl' ( DELIMITER '|' );
+COPY region_normal TO 'region.tbl' ( DELIMITER '|' );
+COPY nation_normal TO 'nation.tbl' ( DELIMITER '|' );
+COPY orders_normal TO 'orders.tbl' ( DELIMITER '|' );

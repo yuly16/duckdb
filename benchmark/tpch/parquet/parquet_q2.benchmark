@@ -1,0 +1,28 @@
+# name: benchmark/tpch/parquet/parquet_q1.benchmark
+# description: Execute Q1 over lineitem stored in a parquet file
+# group: [parquet]
+
+name Q2 (Parquet)
+group parquet
+subgroup tpch
+
+require parquet
+require tpch
+
+load
+CALL dbgen(sf=0.1, suffix='_normal');
+COPY part_normal TO '${BENCHMARK_DIR}/part.parquet' (FORMAT PARQUET);
+CREATE VIEW part AS SELECT * FROM read_parquet('${BENCHMARK_DIR}/part.parquet');
+COPY partsupp_normal TO '${BENCHMARK_DIR}/partsupp.parquet' (FORMAT PARQUET);
+CREATE VIEW partsupp AS SELECT * FROM read_parquet('${BENCHMARK_DIR}/partsupp.parquet');
+COPY supplier_normal TO '${BENCHMARK_DIR}/supplier.parquet' (FORMAT PARQUET);
+CREATE VIEW supplier AS SELECT * FROM read_parquet('${BENCHMARK_DIR}/supplier.parquet');
+COPY nation_normal TO '${BENCHMARK_DIR}/nation.parquet' (FORMAT PARQUET);
+CREATE VIEW nation AS SELECT * FROM read_parquet('${BENCHMARK_DIR}/nation.parquet');
+COPY region_normal TO '${BENCHMARK_DIR}/region.parquet' (FORMAT PARQUET);
+CREATE VIEW region AS SELECT * FROM read_parquet('${BENCHMARK_DIR}/region.parquet');
+
+run
+PRAGMA tpch(2)
+
+result extension/tpch/dbgen/answers/sf0.1/q02.csv
