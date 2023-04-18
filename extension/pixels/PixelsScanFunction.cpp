@@ -142,7 +142,9 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 		}
 	}
 
-	PixelsParallelStateNext(context.client, bind_data, *result, gstate);
+	if(!PixelsParallelStateNext(context.client, bind_data, *result, gstate)) {
+		return nullptr;
+	}
 	PixelsReaderOption option;
 	option.setSkipCorruptRecords(true);
 	option.setTolerantSchemaEvolution(true);
