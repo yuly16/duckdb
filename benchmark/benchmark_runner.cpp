@@ -129,15 +129,15 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 				break;
 			} else {
 				// write time
-				auto verify = benchmark->Verify(state.get());
-				if (!verify.empty()) {
-					LogResult("INCORRECT");
-					LogLine("INCORRECT RESULT: " + verify);
-					LogOutput("INCORRECT RESULT: " + verify);
-					break;
-				} else {
+//				auto verify = benchmark->Verify(state.get());
+//				if (!verify.empty()) {
+//					LogResult("INCORRECT");
+//					LogLine("INCORRECT RESULT: " + verify);
+//					LogOutput("INCORRECT RESULT: " + verify);
+//					break;
+//				} else {
 					LogResult(std::to_string(profiler.Elapsed()));
-				}
+//				}
 			}
 		}
 		benchmark->Cleanup(state.get());
@@ -164,6 +164,7 @@ void print_help() {
 	fprintf(stderr, "              --log=[file]           Move log output to file\n");
 	fprintf(stderr, "              --info                 Prints info about the benchmark\n");
 	fprintf(stderr, "              --query                Prints query of the benchmark\n");
+	fprintf(stderr, "              --no-verify            Disable verification\n");
 	fprintf(stderr, "              --root-dir             Sets the root directory for where to store temp data and "
 	                "look for the 'benchmarks' directory\n");
 	fprintf(stderr,

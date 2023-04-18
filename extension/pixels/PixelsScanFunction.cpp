@@ -286,12 +286,15 @@ bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const P
                                                   PixelsReadLocalState &scan_data,
                                                   PixelsReadGlobalState &parallel_state) {
 	unique_lock<mutex> parallel_lock(parallel_state.lock);
-
 	if (parallel_state.error_opening_file) {
 		throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
 	}
 	if (parallel_state.file_index >= parallel_state.readers.size()) {
+		parallel_lock.unlock();
 		return false;
+	}
+	if(scan_data.reader.get() != nullptr) {
+		scan_data.reader->close();
 	}
 	if (parallel_state.readers[parallel_state.file_index]) {
 		scan_data.reader = parallel_state.readers[parallel_state.file_index];
@@ -305,7 +308,7 @@ bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const P
 		                     ->setPixelsFooterCache(footerCache)
 		                     ->build();
 		parallel_state.readers[parallel_state.file_index] = scan_data.reader;
-
+		scan_data.file_index = parallel_state.file_index;
 	}
 	scan_data.batch_index = parallel_state.file_index;
 	parallel_state.file_index++;

@@ -1,0 +1,39 @@
+# name: benchmark/tpch/parquet/write_lineitem_parquet.benchmark
+# description: Write the lineitem of TPC-H SF1 to a Parquet file
+# group: [parquet]
+
+name Write Lineitem Parquet
+group parquet
+
+require parquet
+
+require tpch
+
+load
+CALL dbgen(sf=0.1);
+
+run
+delete from nation;
+COPY nation FROM '/scratch/data/tpch-300g/nation/nation.tbl' ( DELIMITER '|' );
+COPY nation TO '${BENCHMARK_DIR}/../../parquet_file/nation.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from region;
+COPY region FROM '/scratch/data/tpch-300g/region/region.tbl' ( DELIMITER '|' );
+COPY region TO '${BENCHMARK_DIR}/../../parquet_file/region.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from customer;
+COPY customer FROM '/scratch/data/tpch-300g/customer/customer.tbl' ( DELIMITER '|' );
+COPY customer TO '${BENCHMARK_DIR}/../../parquet_file/customer.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from orders;
+COPY orders FROM '/scratch/data/tpch-300g/orders/orders.tbl' ( DELIMITER '|' );
+COPY orders TO '${BENCHMARK_DIR}/../../parquet_file/orders.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from supplier;
+COPY supplier FROM '/scratch/data/tpch-300g/supplier/supplier.tbl' ( DELIMITER '|' );
+COPY supplier TO '${BENCHMARK_DIR}/../../parquet_file/supplier.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from part;
+COPY part FROM '/scratch/data/tpch-300g/part/part.tbl' ( DELIMITER '|' );
+COPY part TO '${BENCHMARK_DIR}/../../parquet_file/part.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from partsupp;
+COPY partsupp FROM '/scratch/data/tpch-300g/partsupp/partsupp.tbl' ( DELIMITER '|' );
+COPY partsupp TO '${BENCHMARK_DIR}/../../parquet_file/partsupp.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+delete from lineitem;
+COPY lineitem FROM '/scratch/data/tpch-300g/lineitem/lineitem.tbl' ( DELIMITER '|' );
+COPY lineitem TO '${BENCHMARK_DIR}/../../parquet_file/lineitem.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);

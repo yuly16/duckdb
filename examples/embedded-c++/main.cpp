@@ -117,11 +117,12 @@ int main() {
 //		result->Print();
 //	}
 
-//    {
-//        auto result = con.Query("SELECT * from '/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl';");
-//        result->Print();
-//    }
-	tpch_q02(con);
+    {
+        auto result = con.Query("select * from pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-300/lineitem/v-0-order/20230416062318_1159.pxl');");
+        result->Print();
+    }
+
+//	tpch_q02(con);
 
 //	{
 //		auto result = con.Query("SELECT * from '/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl';");
