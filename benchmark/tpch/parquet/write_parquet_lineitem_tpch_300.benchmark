@@ -1,0 +1,18 @@
+# name: benchmark/tpch/parquet/write_lineitem_parquet.benchmark
+# description: Write the lineitem of TPC-H SF1 to a Parquet file
+# group: [parquet]
+
+name Write Lineitem Parquet
+group parquet
+
+require parquet
+
+require tpch
+
+load
+CALL dbgen(sf=0.1);
+
+run
+delete from lineitem;
+COPY lineitem FROM '/scratch/data/tpch-300g/lineitem/lineitem.tbl' ( DELIMITER '|' );
+COPY lineitem TO '${BENCHMARK_DIR}/../../parquet_file/lineitem.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);

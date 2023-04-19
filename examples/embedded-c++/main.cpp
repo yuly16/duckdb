@@ -118,7 +118,20 @@ int main() {
 //	}
 
     {
-        auto result = con.Query("select * from pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-300/lineitem/v-0-order/20230416062318_1159.pxl');");
+        auto result = con.Query("SELECT\n"
+		                        "    p_partkey\n"
+		                        "FROM\n"
+		                        "    '/scratch/liyu/opt/parquet_file/tpch_0_01/part.parquet',\n"
+		                        "    '/scratch/liyu/opt/parquet_file/tpch_0_01/partsupp.parquet'\n"
+		                        "WHERE\n"
+		                        "    ps_supplycost = (\n"
+		                        "        SELECT\n"
+		                        "            min(ps_supplycost)\n"
+		                        "        FROM\n"
+		                        "    '/scratch/liyu/opt/parquet_file/tpch_0_01/partsupp.parquet'\n"
+		                        "        WHERE\n"
+		                        "            p_partkey = ps_partkey)\n"
+		                        "LIMIT 100;");
         result->Print();
     }
 

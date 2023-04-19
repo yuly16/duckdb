@@ -1,0 +1,23 @@
+# name: benchmark/tpch/parquet/write_lineitem_parquet.benchmark
+# description: Write the lineitem of TPC-H SF1 to a Parquet file
+# group: [parquet]
+
+name Write Lineitem Parquet
+group parquet
+
+require parquet
+
+require tpch
+
+load
+CALL dbgen(sf=0.01);
+
+run
+COPY nation TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/nation.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY region TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/region.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY customer TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/customer.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY orders TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/orders.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY supplier TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/supplier.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY part TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/part.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY partsupp TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/partsupp.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
+COPY lineitem TO '${BENCHMARK_DIR}/../../parquet_file/tpch_0_01/lineitem.parquet' (FORMAT 'parquet', CODEC 'UNCOMPRESSED', ROW_GROUP_SIZE 268435456);
