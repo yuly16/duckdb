@@ -10,14 +10,14 @@ require pixels
 require tpch
 
 load
-CREATE VIEW lineitem AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/lineitem/v-0-order/*.pxl');
-CREATE VIEW nation AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/nation/v-0-order/*.pxl');
-CREATE VIEW region AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/region/v-0-order/*.pxl');
-CREATE VIEW supplier AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/supplier/v-0-order/*.pxl');
-CREATE VIEW customer AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/customer/v-0-order/*.pxl');
-CREATE VIEW part AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/part/v-0-order/*.pxl');
-CREATE VIEW partsupp AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/partsupp/v-0-order/*.pxl');
-CREATE VIEW orders AS SELECT * FROM pixels_scan('/scratch/liyu/opt/pixels_file/pixels-tpch-${SF_NUMBER_UNDERSCORE}/orders/v-0-order/*.pxl');
+CREATE VIEW lineitem AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/lineitem/v-0-order/*.pxl');
+CREATE VIEW nation AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/nation/v-0-order/*.pxl');
+CREATE VIEW region AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/region/v-0-order/*.pxl');
+CREATE VIEW supplier AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/supplier/v-0-order/*.pxl');
+CREATE VIEW customer AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/customer/v-0-order/*.pxl');
+CREATE VIEW part AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/part/v-0-order/*.pxl');
+CREATE VIEW partsupp AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/partsupp/v-0-order/*.pxl');
+CREATE VIEW orders AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}/orders/v-0-order/*.pxl');
 
 run extension/tpch/dbgen/queries/q${QUERY_NUMBER_PADDED}.sql
 

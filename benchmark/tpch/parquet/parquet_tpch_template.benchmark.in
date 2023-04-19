@@ -1,0 +1,24 @@
+# name: benchmark/tpch/parquet/parquet_q${QUERY_NUMBER_PADDED}.benchmark
+# description: Execute Q${QUERY_NUMBER_PADDED} over lineitem stored in a parquet file
+# group: [parquet]
+
+name Q${QUERY_NUMBER_PADDED} (parquet)
+group parquet
+subgroup tpch
+
+require parquet
+require tpch
+
+load
+CREATE VIEW lineitem AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/lineitem.parquet');
+CREATE VIEW nation AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/nation.parquet');
+CREATE VIEW region AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/region.parquet');
+CREATE VIEW supplier AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/supplier.parquet');
+CREATE VIEW customer AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/customer.parquet');
+CREATE VIEW part AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/part.parquet');
+CREATE VIEW partsupp AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/partsupp.parquet');
+CREATE VIEW orders AS SELECT * FROM parquet_scan('/scratch/liyu/opt/parquet_file/tpch_${SF_NUMBER_UNDERSCORE}/orders.parquet');
+
+run extension/tpch/dbgen/queries/q${QUERY_NUMBER_PADDED}.sql
+
+result extension/tpch/dbgen/answers/sf${SF_NUMBER}/q${QUERY_NUMBER_PADDED}.csv
