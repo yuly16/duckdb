@@ -1,0 +1,16 @@
+# name: benchmark/tpch/parquet/parquet_q1.benchmark
+# description: Execute Q1 over lineitem stored in a parquet file
+# group: [parquet]
+
+name Q1 (Pixels)
+group pixels
+subgroup tpch
+
+require pixels
+require tpch
+
+
+run
+select * from pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-300/orders/v-0-order/*.pxl');
+
+

@@ -1,7 +1,7 @@
 from os import path, mkdir
-sf = 1
+sf = 300
 root_path = "benchmark/tpch/parquet"
-enable_verification = True
+enable_verification = False
 sf_path = path.join(root_path, "tpch_" + str(sf))
 if not path.exists(sf_path):
     mkdir(sf_path)

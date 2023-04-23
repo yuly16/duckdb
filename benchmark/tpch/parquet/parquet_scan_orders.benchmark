@@ -1,0 +1,15 @@
+# name: benchmark/tpch/parquet/parquet_q1.benchmark
+# description: Execute Q1 over lineitem stored in a parquet file
+# group: [parquet]
+
+name Q1 (Parquet)
+group parquet
+subgroup tpch
+
+require parquet
+require tpch
+
+
+run
+select * from parquet_scan('/data/s1725-2/liyu/parquet-tpch-300g/orders/*');
+

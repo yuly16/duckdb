@@ -20,4 +20,3 @@ CREATE VIEW partsupp AS SELECT * FROM parquet_scan('/data/s1725-2/liyu/parquet-t
 CREATE VIEW orders AS SELECT * FROM parquet_scan('/data/s1725-2/liyu/parquet-tpch-${SF_NUMBER_UNDERSCORE}g/orders/*');
 
 run extension/tpch/dbgen/queries/q${QUERY_NUMBER_PADDED}.sql
-result extension/tpch/dbgen/answers/sf${SF_NUMBER}/q${QUERY_NUMBER_PADDED}.csv
