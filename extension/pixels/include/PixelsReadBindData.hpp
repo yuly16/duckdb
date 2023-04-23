@@ -20,6 +20,7 @@ struct PixelsReadBindData : public TableFunctionData {
 	shared_ptr<PixelsReader> initialPixelsReader;
 	shared_ptr<TypeDescription> fileSchema;
 	vector<string> files;
+	atomic<idx_t> curFileId;
 };
 
 }

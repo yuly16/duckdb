@@ -13,6 +13,22 @@ static idx_t PixelsScanGetBatchIndex(ClientContext &context, const FunctionData 
 	return data.batch_index;
 }
 
+static double PixelsProgress(ClientContext &context, const FunctionData *bind_data_p,
+                              const GlobalTableFunctionState *global_state) {
+	auto &bind_data = (PixelsReadBindData &)*bind_data_p;
+	if (bind_data.files.empty()) {
+		return 100.0;
+	}
+	auto percentage = bind_data.curFileId * 100.0 / bind_data.files.size();
+	return percentage;
+}
+
+static unique_ptr<NodeStatistics> PixelsCardinality(ClientContext &context, const FunctionData *bind_data) {
+	auto &data = (PixelsReadBindData &)*bind_data;
+
+	return make_unique<NodeStatistics>(data.initialPixelsReader->getNumberOfRows() * data.files.size());
+}
+
 TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 	TableFunctionSet set("pixels_scan");
 	TableFunction table_function({LogicalType::VARCHAR}, PixelsScanImplementation, PixelsScanBind,
@@ -21,11 +37,12 @@ TableFunctionSet PixelsScanFunction::GetFunctionSet() {
 //	table_function.filter_pushdown = true;
 //	table_function.filter_prune = true;
 	table_function.get_batch_index = PixelsScanGetBatchIndex;
+	table_function.cardinality = PixelsCardinality;
+	table_function.table_scan_progress = PixelsProgress;
 	// TODO: maybe we need other code here. Refer parquet-extension.cpp
 	set.AddFunction(table_function);
 	return set;
 }
-
 
 
 void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
@@ -65,6 +82,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	output.SetCardinality(vectorizedRowBatch->rowCount);
 	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
 	TransformDuckdbChunk(data.column_ids, vectorizedRowBatch, output, resultSchema);
+	bind_data.curFileId++;
 	return;
 }
 

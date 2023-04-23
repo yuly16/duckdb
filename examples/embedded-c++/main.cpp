@@ -72,13 +72,13 @@ int main() {
 //	}
 
 	// large table parquet example
-//	{
-//		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/leftdate3_192_loop_1.parquet'");
-//		result->Print();
-//	}
+	{
+		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/leftdate3_192_loop_1.parquet'");
+		result->Print();
+	}
 
 //	{
-//		auto result = con.Query("select count(*) from '/scratch/liyu/opt/duckdb/duckdb_benchmark_data/lineitem_10.parquet'");
+//		auto result = con.Query("select * from '/scratch/liyu/opt/duckdb/duckdb_benchmark_data/lineitem_10.parquet'");
 //		result->Print();
 //	}
 
@@ -92,30 +92,30 @@ int main() {
 
 
 	// pixels tpch q1
-	{
-		auto result = con.Query("SELECT\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus,\n"
-		                        "    sum(l_quantity) AS sum_qty,\n"
-		                        "    sum(l_extendedprice) AS sum_base_price,\n"
-		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
-		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
-		                        "    avg(l_quantity) AS avg_qty,\n"
-		                        "    avg(l_extendedprice) AS avg_price,\n"
-		                        "    avg(l_discount) AS avg_disc,\n"
-		                        "    count(*) AS count_order\n"
-		                        "FROM\n"
-		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-1/lineitem/v-0-order/*.pxl'\n"
-		                        "WHERE\n"
-		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
-		                        "GROUP BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus\n"
-		                        "ORDER BY\n"
-		                        "    l_returnflag,\n"
-		                        "    l_linestatus;");
-		result->Print();
-	}
+//	{
+//		auto result = con.Query("SELECT\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus,\n"
+//		                        "    sum(l_quantity) AS sum_qty,\n"
+//		                        "    sum(l_extendedprice) AS sum_base_price,\n"
+//		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
+//		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
+//		                        "    avg(l_quantity) AS avg_qty,\n"
+//		                        "    avg(l_extendedprice) AS avg_price,\n"
+//		                        "    avg(l_discount) AS avg_disc,\n"
+//		                        "    count(*) AS count_order\n"
+//		                        "FROM\n"
+//		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-1/lineitem/v-0-order/*.pxl'\n"
+//		                        "WHERE\n"
+//		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+//		                        "GROUP BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus\n"
+//		                        "ORDER BY\n"
+//		                        "    l_returnflag,\n"
+//		                        "    l_linestatus;");
+//		result->Print();
+//	}
 
 //    {
 //        auto result = con.Query("SELECT\n"
@@ -138,7 +138,7 @@ int main() {
 //	tpch_q02(con);
 
 //	{
-//		auto result = con.Query("SELECT * from '/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-0-order/*.pxl';");
+//		auto result = con.Query("SELECT * from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_0_1.pxl';");
 //		result->Print();
 //	}
 }
