@@ -26,7 +26,7 @@ static double PixelsProgress(ClientContext &context, const FunctionData *bind_da
 static unique_ptr<NodeStatistics> PixelsCardinality(ClientContext &context, const FunctionData *bind_data) {
 	auto &data = (PixelsReadBindData &)*bind_data;
 
-	return make_unique<NodeStatistics>(data.initialPixelsReader->getNumberOfRows() * data.files.size());
+	return make_uniq<NodeStatistics>(data.initialPixelsReader->getNumberOfRows() * data.files.size());
 }
 
 TableFunctionSet PixelsScanFunction::GetFunctionSet() {
@@ -109,12 +109,12 @@ unique_ptr<FunctionData> PixelsScanFunction::PixelsScanBind(
 	TransformDuckdbType(fileSchema, return_types);
 	names = fileSchema->getFieldNames();
 
-	auto result = make_unique<PixelsReadBindData>();
+	auto result = make_uniq<PixelsReadBindData>();
 	result->initialPixelsReader = pixelsReader;
 	result->fileSchema = fileSchema;
 	result->files = files;
 
-	return result;
+	return std::move(result);
 }
 
 unique_ptr<GlobalTableFunctionState> PixelsScanFunction::PixelsScanInitGlobal(
@@ -122,9 +122,7 @@ unique_ptr<GlobalTableFunctionState> PixelsScanFunction::PixelsScanInitGlobal(
 
 	auto &bind_data = (PixelsReadBindData &)*input.bind_data;
 
-	auto result = make_unique<PixelsReadGlobalState>();
-
-	result->file_mutexes = std::unique_ptr<mutex[]>(new mutex[bind_data.files.size()]);
+	auto result = make_uniq<PixelsReadGlobalState>();
 
 	result->readers = std::vector<shared_ptr<PixelsReader>>(bind_data.files.size(), nullptr);
 
@@ -146,7 +144,7 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 
 	auto &gstate = (PixelsReadGlobalState &)*gstate_p;
 
-	auto result = make_unique<PixelsReadLocalState>();
+	auto result = make_uniq<PixelsReadLocalState>();
 
 	result->column_ids = input.column_ids;
 

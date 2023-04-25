@@ -20,10 +20,10 @@ unique_ptr<TableRef> PixelsScanReplacement(ClientContext &context, const string 
 	if (!StringUtil::EndsWith(lower_name, ".pxl") && !StringUtil::Contains(lower_name, ".pxl?")) {
 		return nullptr;
 	}
-	auto table_function = make_unique<TableFunctionRef>();
+	auto table_function = make_uniq<TableFunctionRef>();
 	vector<unique_ptr<ParsedExpression>> children;
-	children.push_back(make_unique<ConstantExpression>(Value(table_name)));
-	table_function->function = make_unique<FunctionExpression>("pixels_scan", std::move(children));
+	children.push_back(make_uniq<ConstantExpression>(Value(table_name)));
+	table_function->function = make_uniq<FunctionExpression>("pixels_scan", std::move(children));
 	return std::move(table_function);
 }
 

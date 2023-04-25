@@ -39,13 +39,13 @@ static void LoadInternal(DatabaseInstance &instance) {
 		CreateScalarFunctionInfo quack_fun_info(
 		    ScalarFunction("quack", {LogicalType::VARCHAR}, LogicalType::VARCHAR, QuackScalarFun));
 		quack_fun_info.on_conflict = OnCreateConflict::ALTER_ON_CONFLICT;
-		catalog.CreateFunction(*con.context, &quack_fun_info);
+		catalog.CreateFunction(*con.context, quack_fun_info);
 	}
 	{
 		CreateScalarFunctionInfo quack_fun_info(
 		    ScalarFunction("fuck", {LogicalType::VARCHAR}, LogicalType::VARCHAR, QuackFuck));
 		quack_fun_info.on_conflict = OnCreateConflict::ALTER_ON_CONFLICT;
-		catalog.CreateFunction(*con.context, &quack_fun_info);
+		catalog.CreateFunction(*con.context, quack_fun_info);
 	}
 
     con.Commit();
