@@ -104,7 +104,7 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 	auto state = benchmark->Initialize(configuration);
 	auto nruns = benchmark->NRuns();
 	for (size_t i = 0; i < nruns; i++) {
-		bool hotrun = i >= 0;
+		bool hotrun = i > 0;
 		if (hotrun) {
 			Log(StringUtil::Format("%s\t%d\t", benchmark->name, i));
 		}
