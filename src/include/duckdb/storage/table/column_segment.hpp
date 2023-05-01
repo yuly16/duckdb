@@ -59,7 +59,7 @@ public:
 	                                                         idx_t start, idx_t count, CompressionType compression_type,
 	                                                         BaseStatistics statistics);
 	static unique_ptr<ColumnSegment> CreateTransientSegment(DatabaseInstance &db, const LogicalType &type, idx_t start,
-	                                                        idx_t segment_size = Storage::BLOCK_SIZE);
+	                                                        idx_t segment_size = Storage::BLOCK_SIZE_);
 	static unique_ptr<ColumnSegment> CreateSegment(ColumnSegment &other, idx_t start);
 
 public:

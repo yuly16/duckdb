@@ -11,6 +11,6 @@ require tpch
 
 
 run
-select * from pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-300/orders/v-0-order/*.pxl');
+select * from pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-300-big-endian/orders/v-0-order/*.pxl');
 
 
