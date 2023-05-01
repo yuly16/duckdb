@@ -186,8 +186,6 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 			//            break;
 			case TypeDescription::SHORT:
 			case TypeDescription::INT:
-				return_types.emplace_back(LogicalType::INTEGER);
-				break;
 			case TypeDescription::LONG:
 				return_types.emplace_back(LogicalType::BIGINT);
 				break;
@@ -243,12 +241,7 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 				//        case TypeDescription::BYTE:
 				//            break;
 			case TypeDescription::SHORT:
-			case TypeDescription::INT: {
-			    auto longCol = std::static_pointer_cast<LongColumnVector>(col);
-			    Vector vector(LogicalType::INTEGER, (data_ptr_t)longCol->vector);
-			    output.data.at(col_id).Reference(vector);
-			    break;
-		    }
+			case TypeDescription::INT:
 			case TypeDescription::LONG: {
 				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
 				Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->vector);
