@@ -311,35 +311,37 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const PixelsReadBindData &bind_data,
                                                   PixelsReadLocalState &scan_data,
                                                   PixelsReadGlobalState &parallel_state) {
-	unique_lock<mutex> parallel_lock(parallel_state.lock);
-	if (parallel_state.error_opening_file) {
-		throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
-	}
-	if (parallel_state.file_index >= parallel_state.readers.size()) {
-		parallel_lock.unlock();
-		return false;
-	}
-	if(scan_data.reader.get() != nullptr) {
-		scan_data.reader->close();
-	}
-	if (parallel_state.readers[parallel_state.file_index]) {
-		scan_data.reader = parallel_state.readers[parallel_state.file_index];
-		scan_data.file_index = parallel_state.file_index;
-	} else {
-		auto footerCache = std::make_shared<PixelsFooterCache>();
-		auto builder = std::make_shared<PixelsReaderBuilder>();
-		shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
-		scan_data.reader = builder->setPath(bind_data.files.at(parallel_state.file_index))
-		                     ->setStorage(storage)
-		                     ->setPixelsFooterCache(footerCache)
-		                     ->build();
-		parallel_state.readers[parallel_state.file_index] = scan_data.reader;
-		scan_data.file_index = parallel_state.file_index;
-	}
-	scan_data.batch_index = parallel_state.file_index;
-	parallel_state.file_index++;
-	parallel_lock.unlock();
-	return true;
+    unique_lock<mutex> parallel_lock(parallel_state.lock);
+    if (parallel_state.error_opening_file) {
+        throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
+    }
+    if (parallel_state.file_index >= parallel_state.readers.size()) {
+        parallel_lock.unlock();
+        return false;
+    }
+    scan_data.file_index = parallel_state.file_index;
+    parallel_state.file_index++;
+    parallel_lock.unlock();
+    // The below code uses global state but no race happens, so we don't need the lock anymore
+    
+    scan_data.batch_index = scan_data.file_index;
+    if(scan_data.reader.get() != nullptr) {
+        scan_data.reader->close();
+    }
+
+    if (parallel_state.readers[scan_data.file_index]) {
+        scan_data.reader = parallel_state.readers[scan_data.file_index];
+    } else {
+        auto footerCache = std::make_shared<PixelsFooterCache>();
+        auto builder = std::make_shared<PixelsReaderBuilder>();
+        shared_ptr<::Storage> storage = StorageFactory::getInstance()->getStorage(::Storage::file);
+        scan_data.reader = builder->setPath(bind_data.files.at(scan_data.file_index))
+                ->setStorage(storage)
+                ->setPixelsFooterCache(footerCache)
+                ->build();
+        parallel_state.readers[scan_data.file_index] = scan_data.reader;
+    }
+    return true;
 }
 
 }
