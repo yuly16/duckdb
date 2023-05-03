@@ -1,0 +1,11 @@
+SELECT
+    l_partkey,
+    l_linenumber,
+    l_extendedprice,
+    l_tax,
+    l_linestatus,
+    l_commitdate,
+    l_shipinstruct,
+    l_comment
+FROM
+    lineitem;
