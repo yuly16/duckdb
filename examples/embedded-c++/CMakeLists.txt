@@ -6,6 +6,7 @@ include_directories(../../third_party/catch)
 include_directories(../../third_party/tpce-tool/include)
 include_directories(../../third_party/sqlite/include)
 include_directories(../../src/include)
+include_directories(../../extension/pixels/pixels-reader-cxx/pixels-common/include)
 #link_directories(/home/liyu/duckdb/cmake-build-debug/src)
 
 add_executable(example-c++ main.cpp)

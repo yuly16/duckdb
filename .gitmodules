@@ -1,3 +1,4 @@
 [submodule "extension/pixels/pixels-reader-cxx"]
 	path = extension/pixels/pixels-reader-cxx
 	url = https://github.com/yuly16/pixels-reader-cxx.git
+	branch = master

@@ -3,7 +3,7 @@ include_directories(../third_party/tpce-tool/include)
 include_directories(../third_party/sqlite/include)
 include_directories(../test/include)
 include_directories(include)
-
+include_directories(../extension/pixels/pixels-reader-cxx/pixels-common/include)
 add_subdirectory(micro)
 if(${BUILD_TPCH_EXTENSION})
   add_subdirectory(tpch)

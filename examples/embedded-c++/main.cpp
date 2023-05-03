@@ -1,5 +1,7 @@
 #include "duckdb.hpp"
 #include <iostream>
+#include "profiler/TimeProfiler.h"
+
 using namespace duckdb;
 
 string lineitem_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/lineitem/v-0-order/*.pxl'");
@@ -73,8 +75,8 @@ int main() {
 
 	// large table parquet example
 	{
-		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/leftdate3_192_loop_1.parquet'");
-		result->Print();
+//		auto result = con.Query("select * from '/home/yuly/project/duckdb/data/parquet-testing/leftdate3_192_loop_1.parquet'");
+//		result->Print();
 	}
 
 //	{
@@ -87,7 +89,7 @@ int main() {
 //	auto result = con.Query("select fuck('Jane') as result");
 //	auto result = con.Query("select n_name from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_0_1.pxl'");
 
-//	auto result1 = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/supplier_0_1.pxl'");
+	auto result1 = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/supplier_0_1.pxl'");
 //	result1->Print();
 
 
@@ -141,4 +143,7 @@ int main() {
 //		auto result = con.Query("SELECT * from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_0_1.pxl';");
 //		result->Print();
 //	}
+
+    TimeProfiler & a = TimeProfiler::Instance();
+    a.Print();
 }

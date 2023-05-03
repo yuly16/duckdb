@@ -51,6 +51,10 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	if (!data_p.local_state) {
 		return;
 	}
+
+
+    ::TimeProfiler::Instance().Start("pixels scan");
+
 	auto &data = (PixelsReadLocalState &)*data_p.local_state;
 	auto &gstate = (PixelsReadGlobalState &)*data_p.global_state;
 	auto &bind_data = (PixelsReadBindData &)*data_p.bind_data;
@@ -61,6 +65,8 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 		data.vectorizedRowBatchs.clear();
 		data.pixelsRecordReader.reset();
 		if(!PixelsParallelStateNext(context, bind_data, data, gstate)) {
+            ::TimeProfiler::Instance().End("pixels scan");
+
 			return;
 		} else {
 			PixelsReaderOption option;
@@ -83,6 +89,8 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
 	TransformDuckdbChunk(data.column_ids, vectorizedRowBatch, output, resultSchema);
 	bind_data.curFileId++;
+    ::TimeProfiler::Instance().End("pixels scan");
+
 	return;
 }
 

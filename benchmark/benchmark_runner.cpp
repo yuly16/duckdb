@@ -14,7 +14,8 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-
+#include <utils/ConfigFactory.h>
+#include "profiler/TimeProfiler.h"
 using namespace duckdb;
 
 void BenchmarkRunner::RegisterBenchmark(Benchmark *benchmark) {
@@ -140,7 +141,11 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 				}
 			}
 		}
+        TimeProfiler::Instance().Print();
+        TimeProfiler::Instance().Reset();
+
 		benchmark->Cleanup(state.get());
+
 	}
 	benchmark->Finalize();
 }

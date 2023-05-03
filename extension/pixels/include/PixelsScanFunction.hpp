@@ -61,6 +61,7 @@
 #include "duckdb/planner/operator/logical_get.hpp"
 #include "duckdb/storage/statistics/base_statistics.hpp"
 #include "duckdb/catalog/catalog_entry/table_function_catalog_entry.hpp"
+#include "profiler/TimeProfiler.h"
 #endif
 
 using namespace std;
