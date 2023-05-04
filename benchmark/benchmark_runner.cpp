@@ -16,6 +16,7 @@
 #include <thread>
 #include <utils/ConfigFactory.h>
 #include "profiler/TimeProfiler.h"
+#include "profiler/CountProfiler.h"
 using namespace duckdb;
 
 void BenchmarkRunner::RegisterBenchmark(Benchmark *benchmark) {
@@ -105,7 +106,8 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 	auto state = benchmark->Initialize(configuration);
 	auto nruns = benchmark->NRuns();
 	for (size_t i = 0; i < nruns + 1; i++) {
-		bool hotrun = i > 0;
+
+		bool hotrun = i >= 0;
 		if (hotrun) {
 			Log(StringUtil::Format("%s\t%d\t", benchmark->name, i));
 		}
@@ -143,7 +145,8 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 		}
         TimeProfiler::Instance().Print();
         TimeProfiler::Instance().Reset();
-
+		CountProfiler::Instance().Print();
+		CountProfiler::Instance().Reset();
 		benchmark->Cleanup(state.get());
 
 	}

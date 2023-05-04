@@ -4,7 +4,7 @@ root_path = "benchmark/tpch/parquet/micro-benchmark"
 sf_path = path.join(root_path, "tpch_" + str(sf))
 if not path.exists(sf_path):
     mkdir(sf_path)
-for i in range(1, 7):
+for i in range(1, 8):
     if i < 10:
         f = open(path.join(sf_path, "parquet_q0" + str(i) + "_tpch_" + str(sf) + ".benchmark"), "w")
     else:

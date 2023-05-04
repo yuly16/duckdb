@@ -12,6 +12,7 @@ string partsupp_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/partsupp/v-
 string part_path("'/scratch/liyu/opt/pixels_file/pixels-tpch-0_1/part/v-0-order/*.pxl'");
 
 void tpch_q02(Connection & con) {
+
 	auto result = con.Query("SELECT\n"
 	                        "    s_acctbal,\n"
 	                        "    s_name,\n"
@@ -61,6 +62,8 @@ void tpch_q02(Connection & con) {
 int main() {
 	DuckDB db(nullptr);
 	Connection con(db);
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 //	con.Query("CREATE TABLE integers(i INTEGER)");
 //	con.Query("INSERT INTO integers VALUES (3)");
 //	auto result = con.Query("SELECT * FROM integers");
@@ -89,7 +92,7 @@ int main() {
 //	auto result = con.Query("select fuck('Jane') as result");
 //	auto result = con.Query("select n_name from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_0_1.pxl'");
 
-	auto result1 = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/supplier_0_1.pxl'");
+//	auto result1 = con.Query("select * from '/home/yuly/project/pixels-reader-cxx/tests/data/supplier_0_1.pxl'");
 //	result1->Print();
 
 
@@ -143,6 +146,9 @@ int main() {
 //		auto result = con.Query("SELECT * from '/home/yuly/project/pixels-reader-cxx/tests/data/nation_0_1.pxl';");
 //		result->Print();
 //	}
+	auto result = con.Query("SELECT * from parquet_scan('/data/s1725-2/liyu/parquet-tpch-300g/partsupp/*');");
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 
     TimeProfiler & a = TimeProfiler::Instance();
     a.Print();

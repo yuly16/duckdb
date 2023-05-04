@@ -5,7 +5,6 @@ SELECT
     l_tax,
     l_linestatus,
     l_commitdate,
-    l_shipinstruct,
-    l_comment
+    l_shipinstruct
 FROM
     lineitem;
