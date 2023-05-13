@@ -252,8 +252,13 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 			case TypeDescription::INT:
 			case TypeDescription::LONG: {
 				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
-				Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->vector);
-				output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
+
+			    for(long i = 0; i < longCol->length; i++) {
+				    result_ptr[i] = longCol->vector[i];
+			    }
+//				Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->vector);
+//				output.data.at(col_id).Reference(vector);
 				break;
 			}
 			//        case TypeDescription::FLOAT:
@@ -262,9 +267,14 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 			//            break;
 		    case TypeDescription::DECIMAL:{
 			    auto decimalCol = std::static_pointer_cast<DecimalColumnVector>(col);
-			    Vector vector(LogicalType::DECIMAL(colSchema->getPrecision(), colSchema->getScale()),
-			                  	(data_ptr_t)decimalCol->vector);
-			    output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
+
+			    for(long i = 0; i < decimalCol->length; i++) {
+				    result_ptr[i] = decimalCol->vector[i];
+			    }
+//			    Vector vector(LogicalType::DECIMAL(colSchema->getPrecision(), colSchema->getScale()),
+//			                  	(data_ptr_t)decimalCol->vector);
+//			    output.data.at(col_id).Reference(vector);
 			    break;
 		    }
 
@@ -273,9 +283,14 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 			case TypeDescription::DATE:{
 			    auto dateCol = std::static_pointer_cast<DateColumnVector>(col);
 			    assert(sizeof(*dateCol->dates) == sizeof(duckdb::date_t));
-			    Vector vector(LogicalType::DATE,
-			                  (data_ptr_t)dateCol->dates);
-			    output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
+
+			    for(long i = 0; i < dateCol->length; i++) {
+				    result_ptr[i] = dateCol->dates[i];
+			    }
+//			    Vector vector(LogicalType::DATE,
+//			                  (data_ptr_t)dateCol->dates);
+//			    output.data.at(col_id).Reference(vector);
 			    break;
 		    }
 
