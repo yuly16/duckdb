@@ -235,10 +235,10 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
                                               DataChunk & output,
                                               const std::shared_ptr<TypeDescription> & schema) {
 	int row_batch_id = 0;
-	for(int col_id = 0; col_id < column_ids.size(); col_id++) {
+	for(auto col_id = 0; col_id < column_ids.size(); col_id++) {
 		if (IsRowIdColumnId(column_ids.at(col_id))) {
 			    Value constant_42 = Value::BIGINT(42);
-			    output.data[col_id].Reference(constant_42);
+			    output.data.at(col_id).Reference(constant_42);
 			    continue;
 		}
 		auto col = vectorizedRowBatch->cols.at(row_batch_id);
