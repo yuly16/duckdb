@@ -147,6 +147,8 @@ int main() {
 //		result->Print();
 //	}
 	auto result = con.Query("SELECT * from parquet_scan('/data/s1725-2/liyu/parquet-tpch-300g/partsupp/*');");
+//	auto result = con.Query("SELECT * from '/data/s1725-2/liyu/pixels_data/pixels-tpch-300-big-endian/partsupp/v-0-order/*.pxl';");
+//	result->Print();
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 

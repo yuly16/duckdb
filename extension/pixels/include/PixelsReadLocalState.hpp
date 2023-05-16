@@ -18,7 +18,9 @@ namespace duckdb {
 struct PixelsReadLocalState : public LocalTableFunctionState {
 	shared_ptr<PixelsRecordReader> pixelsRecordReader;
 	// this is used for storing row batch results.
-	vector<shared_ptr<VectorizedRowBatch>> vectorizedRowBatchs;
+	shared_ptr<VectorizedRowBatch> vectorizedRowBatch;
+	std::vector<shared_ptr<VectorizedRowBatch>> vectorizedRowBatchPool;
+	int rowOffset;
 	vector<column_t> column_ids;
 	vector<string> column_names;
 	shared_ptr<PixelsReader> reader;

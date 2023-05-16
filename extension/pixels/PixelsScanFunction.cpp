@@ -61,12 +61,11 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 
 
 
-	if(data.pixelsRecordReader->isEndOfFile()) {
-		data.vectorizedRowBatchs.clear();
+	if(data.pixelsRecordReader->isEndOfFile() && data.rowOffset >= data.vectorizedRowBatch->rowCount) {
+		data.vectorizedRowBatch->close();
 		data.pixelsRecordReader.reset();
 		if(!PixelsParallelStateNext(context, bind_data, data, gstate)) {
             ::TimeProfiler::Instance().End("pixels scan");
-
 			return;
 		} else {
 			PixelsReaderOption option;
@@ -81,14 +80,24 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 			data.pixelsRecordReader = data.reader->read(option);
 		}
 	}
-	auto pixelsRecordReader = data.pixelsRecordReader;
-	std::shared_ptr<TypeDescription> resultSchema = pixelsRecordReader->getResultSchema();
-	auto vectorizedRowBatch = pixelsRecordReader->readBatch(STANDARD_VECTOR_SIZE, false);
-	assert(vectorizedRowBatch->rowCount > 0);
-	output.SetCardinality(vectorizedRowBatch->rowCount);
-	data.vectorizedRowBatchs.emplace_back(vectorizedRowBatch);
-	TransformDuckdbChunk(data.column_ids, vectorizedRowBatch, output, resultSchema);
-	bind_data.curFileId++;
+    auto pixelsRecordReader = std::static_pointer_cast<PixelsRecordReaderImpl>(data.pixelsRecordReader);
+	if(data.vectorizedRowBatch != nullptr && data.rowOffset >= data.vectorizedRowBatch->rowCount) {
+//		data.vectorizedRowBatch->close();
+		data.vectorizedRowBatch = nullptr;
+	}
+	if(data.vectorizedRowBatch == nullptr) {
+		data.vectorizedRowBatch = pixelsRecordReader->readRowGroup(false);
+		data.vectorizedRowBatchPool.emplace_back(data.vectorizedRowBatch);
+		data.rowOffset = 0;
+	}
+
+	std::shared_ptr<TypeDescription> resultSchema = data.pixelsRecordReader->getResultSchema();
+
+	auto thisOutputChunkRows = MinValue<idx_t>(STANDARD_VECTOR_SIZE, data.vectorizedRowBatch->rowCount - data.rowOffset);
+
+	output.SetCardinality(thisOutputChunkRows);
+	TransformDuckdbChunk(data, output, resultSchema, thisOutputChunkRows);
+	data.rowOffset += thisOutputChunkRows;
     ::TimeProfiler::Instance().End("pixels scan");
 
 	return;
@@ -179,7 +188,7 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 	option.setRGRange(0, result->reader->getRowGroupNum());
 	option.setQueryId(1);
 	result->pixelsRecordReader = result->reader->read(option);
-
+    result->vectorizedRowBatch = nullptr;
 	return std::move(result);
 }
 
@@ -230,12 +239,16 @@ void PixelsScanFunction::TransformDuckdbType(const std::shared_ptr<TypeDescripti
 		}
 	}
 }
-void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_ids,
-                                              const shared_ptr<VectorizedRowBatch> & vectorizedRowBatch,
+void PixelsScanFunction::TransformDuckdbChunk(PixelsReadLocalState & data,
                                               DataChunk & output,
-                                              const std::shared_ptr<TypeDescription> & schema) {
+                                              const std::shared_ptr<TypeDescription> & schema,
+                                              uint64_t thisOutputChunkRows) {
+
 	int row_batch_id = 0;
-	for(auto col_id = 0; col_id < column_ids.size(); col_id++) {
+	int row_offset = data.rowOffset;
+	auto column_ids = data.column_ids;
+	auto vectorizedRowBatch = data.vectorizedRowBatch;
+	for(uint64_t col_id = 0; col_id < column_ids.size(); col_id++) {
 		if (IsRowIdColumnId(column_ids.at(col_id))) {
 			    Value constant_42 = Value::BIGINT(42);
 			    output.data.at(col_id).Reference(constant_42);
@@ -254,11 +267,10 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
 
-			    for(long i = 0; i < longCol->length; i++) {
-				    result_ptr[i] = longCol->vector[i];
+			    for(long i = 0; i < thisOutputChunkRows; i++) {
+				    result_ptr[i] = longCol->vector[i + row_offset];
 			    }
-//				Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->vector);
-//				output.data.at(col_id).Reference(vector);
+
 				break;
 			}
 			//        case TypeDescription::FLOAT:
@@ -269,12 +281,9 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 			    auto decimalCol = std::static_pointer_cast<DecimalColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
 
-			    for(long i = 0; i < decimalCol->length; i++) {
-				    result_ptr[i] = decimalCol->vector[i];
+			    for(long i = 0; i < thisOutputChunkRows; i++) {
+				    result_ptr[i] = decimalCol->vector[i + row_offset];
 			    }
-//			    Vector vector(LogicalType::DECIMAL(colSchema->getPrecision(), colSchema->getScale()),
-//			                  	(data_ptr_t)decimalCol->vector);
-//			    output.data.at(col_id).Reference(vector);
 			    break;
 		    }
 
@@ -282,15 +291,10 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 			//            break;
 			case TypeDescription::DATE:{
 			    auto dateCol = std::static_pointer_cast<DateColumnVector>(col);
-			    assert(sizeof(*dateCol->dates) == sizeof(duckdb::date_t));
 			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
-
-			    for(long i = 0; i < dateCol->length; i++) {
-				    result_ptr[i] = dateCol->dates[i];
+			    for(long i = 0; i < thisOutputChunkRows; i++) {
+				    result_ptr[i] = dateCol->dates[i + row_offset];
 			    }
-//			    Vector vector(LogicalType::DATE,
-//			                  (data_ptr_t)dateCol->dates);
-//			    output.data.at(col_id).Reference(vector);
 			    break;
 		    }
 
@@ -307,9 +311,9 @@ void PixelsScanFunction::TransformDuckdbChunk(const vector<column_t> & column_id
 		    {
 			    auto binaryCol = std::static_pointer_cast<BinaryColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<duckdb::string_t>(output.data.at(col_id));
-			    for(int row_id = 0; row_id < vectorizedRowBatch->rowCount; row_id++) {
-				    int length = binaryCol->lens[row_id];
-				    const char * data = (const char *)binaryCol->vector[row_id] + binaryCol->start[row_id];
+			    for(uint64_t row_id = 0; row_id < thisOutputChunkRows; row_id++) {
+				    int length = binaryCol->lens[row_id + row_offset];
+				    const char * data = (const char *)binaryCol->vector[row_id + row_offset] + binaryCol->start[row_id + row_offset];
 				    result_ptr[row_id] = duckdb::string_t(data, length);
 			    }
 			    break;
