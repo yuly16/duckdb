@@ -10,14 +10,14 @@ require pixels
 require tpch
 
 load
-CREATE VIEW lineitem AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/lineitem/v-0-order/*.pxl');
-CREATE VIEW nation AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/nation/v-0-order/*.pxl');
-CREATE VIEW region AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/region/v-0-order/*.pxl');
-CREATE VIEW supplier AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/supplier/v-0-order/*.pxl');
-CREATE VIEW customer AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/customer/v-0-order/*.pxl');
-CREATE VIEW part AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/part/v-0-order/*.pxl');
-CREATE VIEW partsupp AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/partsupp/v-0-order/*.pxl');
-CREATE VIEW orders AS SELECT * FROM pixels_scan('/data/s1725-2/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/orders/v-0-order/*.pxl');
+CREATE VIEW lineitem AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/lineitem/v-0-order/*.pxl');
+CREATE VIEW nation AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/nation/v-0-order/*.pxl');
+CREATE VIEW region AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/region/v-0-order/*.pxl');
+CREATE VIEW supplier AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/supplier/v-0-order/*.pxl');
+CREATE VIEW customer AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/customer/v-0-order/*.pxl');
+CREATE VIEW part AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/part/v-0-order/*.pxl');
+CREATE VIEW partsupp AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/partsupp/v-0-order/*.pxl');
+CREATE VIEW orders AS SELECT * FROM pixels_scan('/data/s1725-1/liyu/pixels_data/pixels-tpch-${SF_NUMBER_UNDERSCORE}-big-endian/orders/v-0-order/*.pxl');
 
 run extension/tpch/dbgen/queries/q${QUERY_NUMBER_PADDED}.sql
 
