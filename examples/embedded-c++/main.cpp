@@ -98,28 +98,28 @@ int main() {
 
 	// pixels tpch q1
 //	{
-//		auto result = con.Query("SELECT\n"
-//		                        "    l_returnflag,\n"
-//		                        "    l_linestatus,\n"
-//		                        "    sum(l_quantity) AS sum_qty,\n"
-//		                        "    sum(l_extendedprice) AS sum_base_price,\n"
-//		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
-//		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
-//		                        "    avg(l_quantity) AS avg_qty,\n"
-//		                        "    avg(l_extendedprice) AS avg_price,\n"
-//		                        "    avg(l_discount) AS avg_disc,\n"
-//		                        "    count(*) AS count_order\n"
-//		                        "FROM\n"
-//		                        "    '/scratch/liyu/opt/pixels_file/pixels-tpch-1/lineitem/v-0-order/*.pxl'\n"
-//		                        "WHERE\n"
-//		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
-//		                        "GROUP BY\n"
-//		                        "    l_returnflag,\n"
-//		                        "    l_linestatus\n"
-//		                        "ORDER BY\n"
-//		                        "    l_returnflag,\n"
-//		                        "    l_linestatus;");
-//		result->Print();
+		auto result = con.Query("SELECT\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus,\n"
+		                        "    sum(l_quantity) AS sum_qty,\n"
+		                        "    sum(l_extendedprice) AS sum_base_price,\n"
+		                        "    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,\n"
+		                        "    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,\n"
+		                        "    avg(l_quantity) AS avg_qty,\n"
+		                        "    avg(l_extendedprice) AS avg_price,\n"
+		                        "    avg(l_discount) AS avg_disc,\n"
+		                        "    count(*) AS count_order\n"
+		                        "FROM\n"
+		                        "    '/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian/lineitem/v-0-order/*.pxl'\n"
+		                        "WHERE\n"
+		                        "    l_shipdate <= CAST('1998-09-02' AS date)\n"
+		                        "GROUP BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus\n"
+		                        "ORDER BY\n"
+		                        "    l_returnflag,\n"
+		                        "    l_linestatus;");
+		result->Print();
 //	}
 
 //    {
