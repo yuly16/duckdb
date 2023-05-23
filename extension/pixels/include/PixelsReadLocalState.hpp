@@ -21,6 +21,7 @@ struct PixelsReadLocalState : public LocalTableFunctionState {
 	vector<string> column_names;
 	shared_ptr<PixelsReader> reader;
 	idx_t file_index;
+	idx_t rg_index;
 	idx_t batch_index;
 };
 

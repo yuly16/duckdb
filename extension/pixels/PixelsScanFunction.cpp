@@ -57,7 +57,8 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 
 	if(data.pixelsRecordReader->isEndOfFile()) {
 		data.pixelsRecordReader.reset();
-		if(!PixelsParallelStateNext(context, bind_data, data, gstate)) {
+		data.rg_index++;
+		if(data.rg_index >= data.reader->getRowGroupNum() && !PixelsParallelStateNext(context, bind_data, data, gstate)) {
 			return;
 		} else {
 			PixelsReaderOption option;
@@ -67,7 +68,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 
 			// includeCols comes from the caller of PixelsPageSource
 			option.setIncludeCols(data.column_names);
-			option.setRGRange(0, data.reader->getRowGroupNum());
+			option.setRGRange(data.rg_index, 1);
 			option.setQueryId(1);
 			data.pixelsRecordReader = data.reader->read(option);
 		}
@@ -159,7 +160,7 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 
 	// includeCols comes from the caller of PixelsPageSource
 	option.setIncludeCols(result->column_names);
-	option.setRGRange(0, result->reader->getRowGroupNum());
+	option.setRGRange(result->rg_index, 1);
 	option.setQueryId(1);
 	result->pixelsRecordReader = result->reader->read(option);
 	return std::move(result);
@@ -233,6 +234,7 @@ bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const P
     // The below code uses global state but no race happens, so we don't need the lock anymore
     
     scan_data.batch_index = scan_data.file_index;
+	scan_data.rg_index = 0;
     if(scan_data.reader.get() != nullptr) {
         scan_data.reader->close();
     }
