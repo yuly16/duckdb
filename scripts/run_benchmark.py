@@ -131,6 +131,7 @@ def main():
         benchmark_path = benchmark[1]
         files = os.listdir(benchmark_path)
         files = sorted(files)
+
         for benchmark_file in files:
             query = re.search(r'q[0-9]+', benchmark_file).group(0)
             benchmark_abs_path = os.path.join(benchmark_path, benchmark_file)
