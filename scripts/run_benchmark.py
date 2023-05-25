@@ -33,6 +33,7 @@ def run_benchmark(benchmark_abs_path, query, engine, from_disk):
             if found:
                 raise Exception("The benchmark is already run. Please make sure that DEFAULT_NRUNS in benchmark.hpp is 0 (which means the benchmark only runs 1 time) ")
             found = True
+            print(engine + " " + query + " " + result)
             result = float(result)
             if(from_disk):
                 if engine not in result_from_disk.keys():

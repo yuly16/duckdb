@@ -344,3 +344,6 @@ zig-cache/*
 *.db
 
 scripts/result_from_*
+
+# this directory stores some high-frequency code/script/sql command.
+dev/
