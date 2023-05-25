@@ -336,6 +336,7 @@ bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const P
         throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
     }
     if (parallel_state.file_index >= parallel_state.readers.size()) {
+		::BufferPool::Instance().Reset();
         parallel_lock.unlock();
         return false;
     }

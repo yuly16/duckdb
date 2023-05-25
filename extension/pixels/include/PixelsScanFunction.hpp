@@ -40,6 +40,7 @@
 #include "TypeDescription.h"
 #include "vector/ColumnVector.h"
 #include "vector/LongColumnVector.h"
+#include "physical/BufferPool.h"
 #ifndef DUCKDB_AMALGAMATION
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/common/constants.hpp"
