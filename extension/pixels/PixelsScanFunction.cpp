@@ -267,21 +267,20 @@ void PixelsScanFunction::TransformDuckdbChunk(PixelsReadLocalState & data,
 			case TypeDescription::INT: {
 			    auto intCol = std::static_pointer_cast<LongColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
-
-			    for(long i = 0; i < thisOutputChunkRows; i++) {
-				    result_ptr[i] = intCol->intVector[i + row_offset];
-			    }
+			    memcpy(result_ptr, intCol->intVector + row_offset, thisOutputChunkRows * sizeof(int));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = intCol->intVector[i + row_offset];
+//			    }
 
 			    break;
 		    }
 			case TypeDescription::LONG: {
 				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
-
-			    for(long i = 0; i < thisOutputChunkRows; i++) {
-				    result_ptr[i] = longCol->longVector[i + row_offset];
-			    }
-
+			    memcpy(result_ptr, longCol->longVector + row_offset, thisOutputChunkRows * sizeof(long));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = longCol->longVector[i + row_offset];
+//			    }
 				break;
 			}
 			//        case TypeDescription::FLOAT:
@@ -291,10 +290,10 @@ void PixelsScanFunction::TransformDuckdbChunk(PixelsReadLocalState & data,
 		    case TypeDescription::DECIMAL:{
 			    auto decimalCol = std::static_pointer_cast<DecimalColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
-
-			    for(long i = 0; i < thisOutputChunkRows; i++) {
-				    result_ptr[i] = decimalCol->vector[i + row_offset];
-			    }
+			    memcpy(result_ptr, decimalCol->vector + row_offset, thisOutputChunkRows * sizeof(long));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = decimalCol->vector[i + row_offset];
+//			    }
 			    break;
 		    }
 
@@ -303,9 +302,10 @@ void PixelsScanFunction::TransformDuckdbChunk(PixelsReadLocalState & data,
 			case TypeDescription::DATE:{
 			    auto dateCol = std::static_pointer_cast<DateColumnVector>(col);
 			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
-			    for(long i = 0; i < thisOutputChunkRows; i++) {
-				    result_ptr[i] = dateCol->dates[i + row_offset];
-			    }
+			    memcpy(result_ptr, dateCol->dates + row_offset, thisOutputChunkRows * sizeof(int));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = dateCol->dates[i + row_offset];
+//			    }
 			    break;
 		    }
 
