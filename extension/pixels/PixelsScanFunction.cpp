@@ -259,43 +259,53 @@ void PixelsScanFunction::TransformDuckdbChunk(PixelsReadLocalState & data,
 		auto col = vectorizedRowBatch->cols.at(row_batch_id);
 		auto colSchema = schema->getChildren().at(row_batch_id);
 		switch (colSchema->getCategory()) {
-                    //        case TypeDescription::BOOLEAN:
-                    //            break;
-                    //        case TypeDescription::BYTE:
-                    //            break;
-            case TypeDescription::SHORT:
-            case TypeDescription::INT: {
+				//        case TypeDescription::BOOLEAN:
+				//            break;
+				//        case TypeDescription::BYTE:
+				//            break;
+			case TypeDescription::SHORT:
+			case TypeDescription::INT: {
 			    auto intCol = std::static_pointer_cast<LongColumnVector>(col);
-			    Vector vector(LogicalType::INTEGER, (data_ptr_t)intCol->intVector);
-			    output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
+			    memcpy(result_ptr, intCol->intVector + row_offset, thisOutputChunkRows * sizeof(int));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = intCol->intVector[i + row_offset];
+//			    }
+
 			    break;
 		    }
-            case TypeDescription::LONG: {
-                auto longCol = std::static_pointer_cast<LongColumnVector>(col);
-                Vector vector(LogicalType::BIGINT, (data_ptr_t)longCol->longVector);
-                output.data.at(col_id).Reference(vector);
-                break;
-            }
-            //        case TypeDescription::FLOAT:
-            //            break;
-            //        case TypeDescription::DOUBLE:
-            //            break;
+			case TypeDescription::LONG: {
+				auto longCol = std::static_pointer_cast<LongColumnVector>(col);
+			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
+			    memcpy(result_ptr, longCol->longVector + row_offset, thisOutputChunkRows * sizeof(long));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = longCol->longVector[i + row_offset];
+//			    }
+				break;
+			}
+			//        case TypeDescription::FLOAT:
+			//            break;
+			//        case TypeDescription::DOUBLE:
+			//            break;
 		    case TypeDescription::DECIMAL:{
 			    auto decimalCol = std::static_pointer_cast<DecimalColumnVector>(col);
-			    Vector vector(LogicalType::DECIMAL(colSchema->getPrecision(), colSchema->getScale()),
-			                  (data_ptr_t)decimalCol->vector);
-			    output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<long>(output.data.at(col_id));
+			    memcpy(result_ptr, decimalCol->vector + row_offset, thisOutputChunkRows * sizeof(long));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = decimalCol->vector[i + row_offset];
+//			    }
 			    break;
 		    }
 
-		//        case TypeDescription::STRING:
-		//            break;
-		    case TypeDescription::DATE:{
+			//        case TypeDescription::STRING:
+			//            break;
+			case TypeDescription::DATE:{
 			    auto dateCol = std::static_pointer_cast<DateColumnVector>(col);
-			    assert(sizeof(*dateCol->dates) == sizeof(duckdb::date_t));
-			    Vector vector(LogicalType::DATE,
-			                  (data_ptr_t)dateCol->dates);
-			    output.data.at(col_id).Reference(vector);
+			    auto result_ptr = FlatVector::GetData<int>(output.data.at(col_id));
+			    memcpy(result_ptr, dateCol->dates + row_offset, thisOutputChunkRows * sizeof(int));
+//			    for(long i = 0; i < thisOutputChunkRows; i++) {
+//				    result_ptr[i] = dateCol->dates[i + row_offset];
+//			    }
 			    break;
 		    }
 
