@@ -52,20 +52,14 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 		return;
 	}
 
-
-    ::TimeProfiler::Instance().Start("pixels scan");
-
 	auto &data = (PixelsReadLocalState &)*data_p.local_state;
 	auto &gstate = (PixelsReadGlobalState &)*data_p.global_state;
 	auto &bind_data = (PixelsReadBindData &)*data_p.bind_data;
-
-
 
 	if(data.pixelsRecordReader->isEndOfFile() && data.rowOffset >= data.vectorizedRowBatch->rowCount) {
 		data.vectorizedRowBatch->close();
 		data.pixelsRecordReader.reset();
 		if(!PixelsParallelStateNext(context, bind_data, data, gstate)) {
-            ::TimeProfiler::Instance().End("pixels scan");
 			return;
 		} else {
 			PixelsReaderOption option;
@@ -78,6 +72,7 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 			option.setRGRange(0, data.reader->getRowGroupNum());
 			option.setQueryId(1);
 			data.pixelsRecordReader = data.reader->read(option);
+
 		}
 	}
     auto pixelsRecordReader = std::static_pointer_cast<PixelsRecordReaderImpl>(data.pixelsRecordReader);
@@ -98,7 +93,6 @@ void PixelsScanFunction::PixelsScanImplementation(ClientContext &context,
 	output.SetCardinality(thisOutputChunkRows);
 	TransformDuckdbChunk(data, output, resultSchema, thisOutputChunkRows);
 	data.rowOffset += thisOutputChunkRows;
-    ::TimeProfiler::Instance().End("pixels scan");
 
 	return;
 }

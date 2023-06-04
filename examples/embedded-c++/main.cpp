@@ -4,7 +4,7 @@
 
 using namespace duckdb;
 
-string pixels_lineitem_path("'/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian/lineitem/v-0-order/*.pxl'");
+string pixels_lineitem_path("'/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian-smallrg/lineitem/v-0-order/*.pxl'");
 string pixels_supplier_path("'/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian/supplier/v-0-order/*.pxl'");
 string pixels_nation_path("'/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian/nation/v-0-order/*.pxl'");
 string pixels_region_path("'/data/s1725-1/liyu/pixels_data/pixels-tpch-1-small-endian/region/v-0-order/*.pxl'");
@@ -98,21 +98,21 @@ int main() {
 	Connection con(db);
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	tpch_q01(con);
-	tpch_q02(con);
-	// parquet example
-	{
-		auto result = con.Query("SELECT * from parquet_scan(" + parquet_nation_path + ");");
-		result->Print();
-	}
-	// pixels example
-	{
-		auto result = con.Query("SELECT * from " + pixels_nation_path + ";");
-		result->Print();
-	}
+//	tpch_q01(con);
+//	tpch_q02(con);
+//	// parquet example
+//	{
+//		auto result = con.Query("SELECT * from parquet_scan(" + parquet_nation_path + ");");
+//		result->Print();
+//	}
+//	// pixels example
+//	{
+//		auto result = con.Query("SELECT * from " + pixels_nation_path + ";");
+//		result->Print();
+//	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-	
+
 	TimeProfiler::Instance().Print();
 }
