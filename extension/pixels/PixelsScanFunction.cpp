@@ -189,6 +189,7 @@ unique_ptr<LocalTableFunctionState> PixelsScanFunction::PixelsScanInitLocal(
 	option.setQueryId(1);
 	result->pixelsRecordReader = result->reader->read(option);
     result->vectorizedRowBatch = nullptr;
+	::DirectUringRandomAccessFile::Initialize();
 	return std::move(result);
 }
 
@@ -346,7 +347,15 @@ bool PixelsScanFunction::PixelsParallelStateNext(ClientContext &context, const P
         throw InvalidArgumentException("PixelsScanInitLocal: file open error.");
     }
     if (parallel_state.file_index >= parallel_state.readers.size()) {
-		::BufferPool::Instance().Reset();
+		::BufferPool::Reset();
+		// if async io is enabled, we need to unregister uring buffer
+		if(ConfigFactory::Instance().boolCheckProperty("localfs.enable.async.io")) {
+			if(ConfigFactory::Instance().getProperty("localfs.async.lib") == "iouring") {
+				::DirectUringRandomAccessFile::Reset();
+			} else if(ConfigFactory::Instance().getProperty("localfs.async.lib") == "aio") {
+				throw InvalidArgumentException("PhysicalLocalReader::readAsync: We don't support aio for our async read yet.");
+			}
+		}
         parallel_lock.unlock();
         return false;
     }
