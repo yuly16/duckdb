@@ -105,11 +105,11 @@ int main() {
 //		auto result = con.Query("SELECT * from parquet_scan(" + parquet_nation_path + ");");
 //		result->Print();
 //	}
-//	// pixels example
-//	{
-//		auto result = con.Query("SELECT * from " + pixels_nation_path + ";");
-//		result->Print();
-//	}
+	// pixels example
+	{
+		auto result = con.Query("SELECT * from " + pixels_nation_path + ";");
+		result->Print();
+	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
