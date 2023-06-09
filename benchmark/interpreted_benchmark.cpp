@@ -7,7 +7,7 @@
 #include "duckdb/main/extension_helper.hpp"
 #include "duckdb/main/query_profiler.hpp"
 #include "test_helpers.hpp"
-
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -466,11 +466,14 @@ string InterpretedBenchmark::VerifyInternal(BenchmarkState *state_p, Materialize
 }
 
 string InterpretedBenchmark::Verify(BenchmarkState *state_p) {
+	auto &state = (InterpretedBenchmarkState &)*state_p;
+	std::cout<<"RowCount="<<state.result->RowCount()<<std::endl;
+
 	if (result_column_count == 0) {
 		// no result specified
 		return string();
 	}
-	auto &state = (InterpretedBenchmarkState &)*state_p;
+
 	if (state.result->HasError()) {
 		return state.result->GetError();
 	}
