@@ -160,7 +160,7 @@ public:
 	static TableFunctionSet GetFunctionSet() {
 		TableFunction table_function("parquet_scan", {LogicalType::VARCHAR}, ParquetScanImplementation, ParquetScanBind,
 		                             ParquetScanInitGlobal, ParquetScanInitLocal);
-		table_function.statistics = ParquetScanStats;
+//		table_function.statistics = ParquetScanStats;
 		table_function.cardinality = ParquetCardinality;
 		table_function.table_scan_progress = ParquetProgress;
 		table_function.named_parameters["binary_as_string"] = LogicalType::BOOLEAN;
@@ -173,8 +173,8 @@ public:
 		table_function.get_batch_info = ParquetGetBatchInfo;
 
 		table_function.projection_pushdown = true;
-		table_function.filter_pushdown = true;
-		table_function.filter_prune = true;
+//		table_function.filter_pushdown = true;
+//		table_function.filter_prune = true;
 		table_function.pushdown_complex_filter = ParquetComplexFilterPushdown;
 		return MultiFileReader::CreateFunctionSet(table_function);
 	}
