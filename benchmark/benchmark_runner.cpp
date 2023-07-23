@@ -6,6 +6,7 @@
 #include "duckdb.hpp"
 #include "duckdb_benchmark.hpp"
 #include "interpreted_benchmark.hpp"
+#include "profiler/TimeProfiler.h"
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
@@ -141,6 +142,7 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 			}
 		}
 		benchmark->Cleanup(state.get());
+        ::TimeProfiler::Instance().Print();
 	}
 	benchmark->Finalize();
 }
