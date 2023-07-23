@@ -1,6 +1,7 @@
 #include "duckdb/parallel/pipeline_executor.hpp"
 #include "duckdb/main/client_context.hpp"
 #include "duckdb/common/limits.hpp"
+#include "profiler/TimeProfiler.h"
 
 namespace duckdb {
 
@@ -41,17 +42,24 @@ bool PipelineExecutor::Execute(idx_t max_chunks) {
 	auto &source_chunk = pipeline.operators.empty() ? final_chunk : *intermediate_chunks[0];
 	for (idx_t i = 0; i < max_chunks; i++) {
 		if (IsFinished()) {
+            ::TimeProfiler::Instance().Collect();
 			break;
 		}
 		source_chunk.Reset();
+        ::TimeProfiler::Instance().Start("source");
 		FetchFromSource(source_chunk);
+        ::TimeProfiler::Instance().End("source");
 		if (source_chunk.size() == 0) {
+            ::TimeProfiler::Instance().Collect();
 			exhausted_source = true;
 			break;
 		}
+        ::TimeProfiler::Instance().Start("sink");
 		auto result = ExecutePushInternal(source_chunk);
+        ::TimeProfiler::Instance().End("sink");
 		if (result == OperatorResultType::FINISHED) {
 			D_ASSERT(IsFinished());
+            ::TimeProfiler::Instance().Collect();
 			break;
 		}
 	}

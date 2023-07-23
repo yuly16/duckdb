@@ -6,6 +6,8 @@
 #include "duckdb.hpp"
 #include "duckdb_benchmark.hpp"
 #include "interpreted_benchmark.hpp"
+#include "profiler/TimeProfiler.h"
+#include "profiler/CountProfiler.h"
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
@@ -104,6 +106,7 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 	auto state = benchmark->Initialize(configuration);
 	auto nruns = benchmark->NRuns();
 	for (size_t i = 0; i < nruns; i++) {
+        ::TimeProfiler::Instance().Reset();
 		bool hotrun = i >= 0;
 		if (hotrun) {
 			Log(StringUtil::Format("%s\t%d\t", benchmark->name, i));
@@ -141,6 +144,8 @@ void BenchmarkRunner::RunBenchmark(Benchmark *benchmark) {
 			}
 		}
 		benchmark->Cleanup(state.get());
+        ::TimeProfiler::Instance().Print();
+        ::CountProfiler::Instance().Print();
 	}
 	benchmark->Finalize();
 }

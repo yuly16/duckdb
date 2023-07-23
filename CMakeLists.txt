@@ -465,7 +465,8 @@ if(OS_NAME STREQUAL "windows")
   endif()
 endif()
 
-
+include_directories(../pixels-common/include)
+include_directories(../pixels-core/include)
 include_directories(src/include)
 include_directories(third_party/fsst)
 include_directories(third_party/fmt/include)
