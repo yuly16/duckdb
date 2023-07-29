@@ -70,12 +70,14 @@ void DataChunk::Reset() {
 	if (data.empty()) {
 		return;
 	}
-	if (vector_caches.size() != data.size()) {
-		throw InternalException("VectorCache and column count mismatch in DataChunk::Reset");
-	}
-	for (idx_t i = 0; i < ColumnCount(); i++) {
-		data[i].ResetFromCache(vector_caches[i]);
-	}
+    if(!vector_caches.empty()) {
+        if (vector_caches.size() != data.size()) {
+            throw InternalException("VectorCache and column count mismatch in DataChunk::Reset");
+        }
+        for (idx_t i = 0; i < ColumnCount(); i++) {
+            data[i].ResetFromCache(vector_caches[i]);
+        }
+    }
 	capacity = STANDARD_VECTOR_SIZE;
 	SetCardinality(0);
 }
