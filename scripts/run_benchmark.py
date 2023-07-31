@@ -12,7 +12,7 @@ result_from_page_cache = {}
 
 
 def clean_page_cache():
-    cmd = "sudo /scratch/pixels-external/drop_cache.sh"
+    cmd = "sudo bash -c \"sync; echo 3 > /proc/sys/vm/drop_caches\""
     if verbose:
         print(cmd)
     os.system(cmd)
@@ -25,7 +25,7 @@ def run_benchmark(benchmark_abs_path, query, engine, from_disk):
     if verbose:
         print(cmd)
     # os.system(cmd)
-    results =  subprocess.getoutput(cmd)
+    results =  subprocess.getoutput("sudo " + cmd)
     pattern = '^[0-9]+\.[0-9]+$'
     found = False
     for result in results.split("\n"):
