@@ -34,8 +34,10 @@ vector<string> MultiFileReader::GetFileList(ClientContext &context, const Value 
 			if (val.IsNull()) {
 				throw ParserException("%s reader cannot take NULL input as parameter", name);
 			}
-			auto glob_files = fs.GlobFiles(StringValue::Get(val), context, options);
-			files.insert(files.end(), glob_files.begin(), glob_files.end());
+            if(fs.DirectoryExists(StringValue::Get(val))) {
+                auto glob_files = fs.GlobFiles(StringValue::Get(val), context, options);
+                files.insert(files.end(), glob_files.begin(), glob_files.end());
+            }
 		}
 	} else {
 		throw InternalException("Unsupported type for MultiFileReader::GetFileList");
