@@ -198,10 +198,24 @@ public:
 				throw NotImplementedException("Unsupported option for COPY FROM parquet: %s", option.first);
 			}
 		}
-
-		auto files = MultiFileReader::GetFileList(context, Value(info.file_path), "Parquet");
+        auto files = MultiFileReader::GetFileList(context, Value(info.file_path), "Parquet", FileGlobOptions::ALLOW_EMPTY);
+        sort(files.begin(), files.end(), compare_file_name());
 		return ParquetScanBindInternal(context, std::move(files), expected_types, expected_names, parquet_options);
 	}
+
+    struct compare_file_name {
+        inline bool operator() (const string& path1, const string& path2) {
+            int num1 = filename2num(path1);
+            int num2 = filename2num(path2);
+            return num1 < num2;
+        }
+
+        // the pixels file name format is ${number}_xxx. We transfer this name to ${number}
+        static int filename2num(const string & path) {
+            string filename = path.substr(path.rfind('/') + 1);
+            return std::stoi(filename.substr(0, filename.rfind('_')));
+        }
+    };
 
 	static unique_ptr<BaseStatistics> ParquetScanStats(ClientContext &context, const FunctionData *bind_data_p,
 	                                                   column_t column_index) {
@@ -290,7 +304,8 @@ public:
 
 	static unique_ptr<FunctionData> ParquetScanBind(ClientContext &context, TableFunctionBindInput &input,
 	                                                vector<LogicalType> &return_types, vector<string> &names) {
-		auto files = MultiFileReader::GetFileList(context, input.inputs[0], "Parquet");
+        auto files = MultiFileReader::GetFileList(context, input.inputs[0], "Parquet", FileGlobOptions::ALLOW_EMPTY);
+        sort(files.begin(), files.end(), compare_file_name());
 		ParquetOptions parquet_options(context);
 		for (auto &kv : input.named_parameters) {
 			auto loption = StringUtil::Lower(kv.first);
