@@ -34,6 +34,7 @@
 #include "duckdb/catalog/catalog_entry/table_function_catalog_entry.hpp"
 #include "duckdb/common/multi_file_reader.hpp"
 #include "duckdb/storage/table/row_group.hpp"
+#include "utils/ConfigFactory.h"
 #endif
 
 namespace duckdb {
@@ -391,7 +392,13 @@ public:
 		result->row_group_index = 0;
 		result->file_index = 0;
 		result->batch_index = 0;
-		result->max_threads = ParquetScanMaxThreads(context, input.bind_data.get());
+        int max_threads = std::stoi(ConfigFactory::Instance().getProperty("parquet.threads"));
+        if (max_threads <= 0) {
+            max_threads = ParquetScanMaxThreads(context, input.bind_data.get());
+        }
+        //	result->max_threads = ParquetScanMaxThreads(context, input.bind_data.get());
+        result->max_threads = max_threads;
+        std::cout<<max_threads<<std::endl;
 		if (input.CanRemoveFilterColumns()) {
 			result->projection_ids = input.projection_ids;
 			const auto table_types = bind_data.types;
